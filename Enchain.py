@@ -10,11 +10,20 @@ from PyQt5.QtCore import Qt
 
 import sys
 import os
-sys.path.append(r"./ui")
-from main_window import Ui_MainWindow
-
-
 import numpy as np
+import platform
+if 'Windows' in platform.system():
+	# Please set it
+	PRO_DIR = r"H:\Clouds\pythonPro\A_Github\Enchain"
+else:
+	PRO_DIR = os.path.dirname(__file__)
+
+file_path = os.path.join(PRO_DIR, "ui")
+sys.path.append(file_path)
+from mainwindow import Ui_MainWindow
+
+
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):

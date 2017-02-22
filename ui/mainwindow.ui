@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>625</height>
+    <width>1080</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,18 +17,18 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>60</y>
-      <width>451</width>
-      <height>421</height>
+      <x>20</x>
+      <y>40</y>
+      <width>551</width>
+      <height>451</height>
      </rect>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>760</x>
-      <y>540</y>
+      <x>140</x>
+      <y>550</y>
       <width>118</width>
       <height>23</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>490</y>
+      <x>40</x>
+      <y>510</y>
       <width>311</width>
       <height>27</height>
      </rect>
@@ -50,8 +50,8 @@
    <widget class="QPushButton" name="pushButton_Open">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>490</y>
+      <x>380</x>
+      <y>510</y>
       <width>99</width>
       <height>27</height>
      </rect>
@@ -63,8 +63,8 @@
    <widget class="QPushButton" name="pushButton_Save">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>530</y>
+      <x>380</x>
+      <y>550</y>
       <width>99</width>
       <height>27</height>
      </rect>
@@ -79,7 +79,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>884</width>
+     <width>1080</width>
      <height>25</height>
     </rect>
    </property>
@@ -90,6 +90,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -98,7 +99,25 @@
     <addaction name="actionAuthor_Info"/>
     <addaction name="actionAbout_Enchain"/>
    </widget>
+   <widget class="QMenu" name="menuTool">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuManage">
+    <property name="title">
+     <string>Manage</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuTool"/>
+   <addaction name="menuManage"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -122,6 +141,11 @@
   <action name="actionAbout_Enchain">
    <property name="text">
     <string>About Enchain</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
    </property>
   </action>
  </widget>

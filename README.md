@@ -26,6 +26,11 @@ PyQt5.8
 
 
 
+# Acknowladgement
+
+Icons:https://github.com/Templarian/MaterialDesign
+
+
 
 
 
