@@ -1,104 +1,287 @@
 # coding=utf-8
-""" """
+"""
+Version: v1.0.0
+"""
+
+# TODO:
+# logo size->doc
+# updateGit comment
+
+# img check: check in/out
+# auto-check img adding to folder
+
+# Debug
+Debug = True
+if Debug:
+	pass
+else:
+	pass
 
 # opencv
 import cv2
 # qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QGraphicsScene, QGraphicsPixmapItem
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, qApp,\
+	QMainWindow, QWidget, QFileDialog, QGraphicsScene,\
+	QGraphicsPixmapItem, QMessageBox, QAction
 
+from PyQt5.QtGui import QPixmap, QImage, QIcon
+from PyQt5.QtCore import Qt
+# Misc
 import sys
 import os
 import numpy as np
 import platform
-if 'Windows' in platform.system():
-	# Please set it
-	PRO_DIR = r"H:\Clouds\pythonPro\A_Github\Enchain"
+if "Windows" in platform.system():
+	# Set it if need
+	PRO_DIR = ur"H:\Clouds\pythonPro\A_Github\Enchain"
 else:
 	PRO_DIR = os.path.dirname(__file__)
 
 file_path = os.path.join(PRO_DIR, "ui")
 sys.path.append(file_path)
+icon_path = os.path.join(PRO_DIR, "icons")
+
 from mainwindow import Ui_MainWindow
 
 
+class ImgList(object):
 
+	def __init__(self, folder):
+		self.cur_idx = 0
+		self.img_dirname = folder
+		self.img_names = self.getContainedImgs(folder)
+		self.img_cnt = 0
+
+	def getContainedImgs(self, folder):
+		supported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
+		file_names = []
+		for root, dirs, filenames in os.walk(folder):
+			for filename in filenames:
+				if not filename.startswith('.'): # not hiden file
+					if filename.split(".")[-1].upper() in supported_img_suffix:
+						file_names.append(filename)
+						print(file_names)
+						self.img_cnt += 1
+		return file_names
+
+	def FirstImg(self):
+		return os.path.join(self.img_dirname, self.img_names[0])
+
+	def nextImg(self):
+		self.cur_idx += 1
+		return os.path.join(self.img_dirname, self.img_names[self.safeLimit(self.cur_idx)])
+
+	def previousImg(self):
+		self.cur_idx -= 1
+		return os.path.join(self.img_dirname, self.img_names[self.safeLimit(self.cur_idx)])
+
+	def safeLimit(self, idx):
+		if idx > self.img_cnt:
+			self.cur_idx = self.img_cnt
+			return self.img_cnt
+		elif idx < 0:
+			self.cur_idx = 0
+			return 0
+		else:
+			return idx
+
+	def prn_obj(obj):
+	    print '\n'.join(['%s:%s' % item for item in obj.__dict__.items()])
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+	"""
+	Main Window in Enchain.
+	"""
 	def __init__(self, parent=None):
+		super(QMainWindow, self).__init__()
 		QMainWindow.__init__(self, parent)
 		self.setupUi(self)
 		self.setup()
 		self.addEvent()
 
+
 	def setup(self):
-		print('setup')
-		self.fileDialog = QFileDialog()
+		self.setWindowIcon(QIcon(icon_path + ur"/EnchainLogo.png"))
+		self.gFileDialog = QFileDialog()
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
 
-		self.image = None
+		self.gImage = None
+		self.gWorkspace = None
+		self.gimg_list = None
 
+		self.setupMenubar()
+		self.setupToolbar()
+		self.setupButtons()
+		self.setupStatusbar()
+
+
+
+	def setupMenubar(self):
+		self.menubar.setNativeMenuBar(False)  # better for cross-platform
+
+
+		self.actionQuit.setIcon(QIcon(icon_path + ur"/close-circle.svg"))
+		self.actionQuit.setShortcut(ur"Ctrl+Q")
+		self.actionQuit.setStatusTip(ur"Quit Software")
+		self.actionQuit.triggered.connect(qApp.quit)
+
+		self.actionClose.setStatusTip(ur"Close File")
+		self.actionClose.triggered.connect(self.clearView)
+
+		self.actionOpenImage.setStatusTip(ur"Open Single Image")
+		self.actionOpenImage.triggered.connect(self.openImage)
+
+		self.actionSaveImage.setStatusTip(ur"Save Image")
+		self.actionSaveImage.triggered.connect(self.SaveImage)
+
+		self.actionSaveImage.setStatusTip(ur"Open Folder Contains Images")
+		self.actionOpenFolder.triggered.connect(self.setWorkspace)
+
+	def setupToolbar(self):
+		self.toolbar = self.addToolBar(ur"maintoolbar")
+
+		actionPrevious = QAction(QIcon(icon_path + ur"/arrow-left-bold-circle.svg"), ur"Previous", self)
+		actionPrevious.setShortcut(ur"Ctrl+LeftArrow")
+		actionPrevious.triggered.connect(self.showPreviousImg)
+		self.toolbar.addAction(actionPrevious)
+		
+		actionNext = QAction(QIcon(icon_path + ur"/arrow-right-bold-circle.svg"), ur"Next", self)
+		actionNext.setShortcut(ur"Ctrl+N")
+		actionNext.triggered.connect(self.showNextImg)
+		self.toolbar.addAction(actionNext)
+		
+		actionSelect = QAction(QIcon(icon_path + ur"/check-circle.svg"), ur"Select", self)
+		actionSelect.setShortcut(ur"Ctrl+Enter")
+		actionSelect.triggered.connect(self.selectImg)
+		self.toolbar.addAction(actionSelect)
+
+
+	def setupButtons(self):
+			pass
+
+	def setupStatusbar(self):
+		self.statusBar().showMessage("Ready")
 
 	def addEvent(self):
-		print('addEvent')
-		self.pushButton_Open .clicked.connect(self.fileSelectBtnClickHandler)
-		self.pushButton_Save.clicked.connect(self.saveBtnClickHandler)
+		print("addEvent")
 
-	def fileSelectBtnClickHandler(self):
-		print('clicked!')
-		path = os.path.expanduser('~') + '/pictures/'
-		print(path)
-		file = self.fileDialog.getOpenFileName(self, "Open file", path)
-		if file[0]:
-			self.lineEdit.setText(file[0])
-			self.opencPic(self.lineEdit.text())
+	def printToStatus(self, message):
+		self.statusBar().showMessage(message)
 
-	def opencPic(self, imgsrc):
-		self.image = cv2.imread(imgsrc)
-		# reset
-		self.currentCvImage = None
-		self.currentCvImage = self.image.copy()
-		pixmap = QPixmap(imgsrc)
-		self.updateImage(pixmap)
+	def openImage(self):
+		if Debug:
+			path = os.path.join(PRO_DIR, ur"/test/img_folder")
+		else:
+			path = os.path.expanduser(ur"~")
 
-	def updateImage(self, qpixmap):
-		self.deleteSceneItems()
+		img_path = self.gFileDialog.getOpenFileName(self, ur"Open File", path)
+		if img_path[0]:
+			self.showImg(img_path[0])
+
+	def showImg(self, img_path):
+		self.gImage = cv2.imread(img_path)
+		self.currentCvImage = None  # reset
+		self.currentCvImage = self.gImage.copy()
+		pixmap = QPixmap(img_path)
+		self.updateView(pixmap)
+
+	def getPixmap(self, img_path):
+		self.gImage = cv2.imread(img_path)
+		self.currentCvImage = None  # reset
+		self.currentCvImage = self.gImage.copy()
+		pixmap = QPixmap(img_path)
+		return pixmap
+
+	def updateView(self, qpixmap):
+		self.clearView()
 		viewWidth = self.graphicsView.frameGeometry().width()
 		viewHeight = self.graphicsView.frameGeometry().height()
-
 		pixRatioMap = qpixmap.scaled(viewWidth, viewHeight, Qt.KeepAspectRatio)
 		pixItem = QGraphicsPixmapItem(pixRatioMap)
 		self.graphicsscene.addItem(pixItem)
 		self.graphicsscene.update()
 
-	def deleteSceneItems(self):
+	def clearView(self):
 		items = self.graphicsscene.items()
 		for item in items:
 			self.graphicsscene.removeItem(item)
 
+	def setWorkspace(self):
+		if Debug:
+			path = os.path.join(PRO_DIR, ur"/test/img_folder")
+		else:
+			path = os.path.expanduser(ur"~")
 
-	def changeCvToQPixmap(self, cvImage):
+		folder_path = self.gFileDialog.getExistingDirectory(self, ur"Open Folder", path)
+		if folder_path is not None:
+			self.gWorkspace = folder_path
+		print(self.gWorkspace)
+		self.gimg_list = ImgList(self.gWorkspace)
+		self.showImg(self.gimg_list.FirstImg())
+
+
+	def showNextImg(self):
+		self.showImg(self.gimg_list.nextImg())
+
+
+	def showPreviousImg(self):
+		self.showImg(self.gimg_list.previousImg())
+		pass
+
+	def selectImg(self):
+		print("selectImg")
+		pass
+
+
+	def convert_CvImgToQPixmap(self, cvImage):
 		height, width, dim = cvImage.shape
 		bytesPerLine = dim * width
-
 		qimg = QImage(cvImage.data, width, height, bytesPerLine, QImage.Format_RGB888)
-
 		return QPixmap.fromImage(qimg)
 
+	def convert_CvImgToQImg(self, cvImage):
+		height, width, dim = cvImage.shape
+		bytesPerLine = dim * width
+		qimg = QImage(cvImage.data, width, height, bytesPerLine, QImage.Format_RGB888)
+		return qimg
 
-	def saveBtnClickHandler(self):
-
+	def SaveImage(self):
+		default_name = "test.jpg"
 		try:
 			if self.currentCvImage is not None:
-				file = self.fileDialog.getSaveFileName(self, "Save file", os.path.expanduser('~') + '/home')
+				file = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
 				if file[0]:
 					cv2.imwrite(file[0],self.currentCvImage)
 			else:
 				print("Empty!")
 		except:
-			print("Error!")
+			print("No Image!")
+
+	def getContainedFiles(self, folder):
+		file_names = []
+		for root, dirs, filenames in os.walk(folder):
+			for filename in filenames:
+				if not filename.startswith('.'): # not hiden file
+					file_names.append(filename)
+		return file_names
+
+
+	def closeEvent(self, event):
+		if Debug:
+			pass
+		else:
+			reply = QMessageBox.question(self, "Message",
+				"Are you sure to quit?", QMessageBox.Yes |
+				QMessageBox.No, QMessageBox.No)
+
+			if reply == QMessageBox.Yes:
+				event.accept()
+			else:
+				event.ignore()
+
+
+
 
 
 if __name__ == "__main__":
