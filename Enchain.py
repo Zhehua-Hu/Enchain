@@ -1,14 +1,22 @@
 # coding=utf-8
 """
+ Copyright {2017} {Zhehua-Hu}
 Version: v1.0.0
 """
 
 # TODO:
-# logo size->doc
+# img_cnt bug
 # updateGit comment
+
+
+# reorderImgs()
+# img_select
 
 # img check: check in/out
 # auto-check img adding to folder
+# tag & version1
+
+# read labelImg
 
 # Debug
 Debug = True
@@ -44,13 +52,18 @@ icon_path = os.path.join(PRO_DIR, "icons")
 from mainwindow import Ui_MainWindow
 
 
-class ImgList(object):
+class ImgList():
+	"""
+class: provide image list management
+"""
+
+	cur_idx = 0
+	img_cnt = 0
 
 	def __init__(self, folder):
-		self.cur_idx = 0
 		self.img_dirname = folder
 		self.img_names = self.getContainedImgs(folder)
-		self.img_cnt = 0
+		print '\n'.join(['%s:%s' % item for item in self.__dict__.items()])
 
 	def getContainedImgs(self, folder):
 		supported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
@@ -60,7 +73,6 @@ class ImgList(object):
 				if not filename.startswith('.'): # not hiden file
 					if filename.split(".")[-1].upper() in supported_img_suffix:
 						file_names.append(filename)
-						print(file_names)
 						self.img_cnt += 1
 		return file_names
 
@@ -69,24 +81,24 @@ class ImgList(object):
 
 	def nextImg(self):
 		self.cur_idx += 1
-		return os.path.join(self.img_dirname, self.img_names[self.safeLimit(self.cur_idx)])
+		self.cur_idx = self.safeLimit(self.cur_idx)
+		return os.path.join(self.img_dirname, self.img_names[self.cur_idx])
 
 	def previousImg(self):
 		self.cur_idx -= 1
-		return os.path.join(self.img_dirname, self.img_names[self.safeLimit(self.cur_idx)])
+		self.cur_idx = self.safeLimit(self.cur_idx)
+		return os.path.join(self.img_dirname, self.img_names[self.cur_idx])
 
 	def safeLimit(self, idx):
-		if idx > self.img_cnt:
-			self.cur_idx = self.img_cnt
-			return self.img_cnt
+		if idx > self.img_cnt-1:
+			return self.img_cnt-1
 		elif idx < 0:
-			self.cur_idx = 0
 			return 0
 		else:
 			return idx
 
-	def prn_obj(obj):
-	    print '\n'.join(['%s:%s' % item for item in obj.__dict__.items()])
+	def __repr__(self):
+		print '\n'.join(['%s:%s' % item for item in self.__dict__.items()])
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
@@ -101,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 	def setup(self):
-		self.setWindowIcon(QIcon(icon_path + ur"/EnchainLogo.png"))
+		self.setWindowIcon(QIcon(icon_path + ur"/EnchainLogoLittle.png"))
 		self.gFileDialog = QFileDialog()
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
@@ -171,11 +183,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def openImage(self):
 		if Debug:
-			path = os.path.join(PRO_DIR, ur"/test/img_folder")
+			openImage_path = os.path.join(PRO_DIR, ur"test/img_folder")
 		else:
-			path = os.path.expanduser(ur"~")
+			openImage_path = os.path.expanduser(ur"~")
 
-		img_path = self.gFileDialog.getOpenFileName(self, ur"Open File", path)
+		img_path = self.gFileDialog.getOpenFileName(self, ur"Open File", openImage_path)
 		if img_path[0]:
 			self.showImg(img_path[0])
 
@@ -209,25 +221,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def setWorkspace(self):
 		if Debug:
-			path = os.path.join(PRO_DIR, ur"/test/img_folder")
+			setWorkspace_path = os.path.join(PRO_DIR, ur"test/")
 		else:
-			path = os.path.expanduser(ur"~")
+			setWorkspace_path = os.path.expanduser(ur"~")
 
-		folder_path = self.gFileDialog.getExistingDirectory(self, ur"Open Folder", path)
+		folder_path = self.gFileDialog.getExistingDirectory(self, ur"Open Folder", setWorkspace_path)
 		if folder_path is not None:
 			self.gWorkspace = folder_path
-		print(self.gWorkspace)
+
 		self.gimg_list = ImgList(self.gWorkspace)
+		# print(self.gimg_list)
 		self.showImg(self.gimg_list.FirstImg())
 
 
 	def showNextImg(self):
+		print("showNextImg")
 		self.showImg(self.gimg_list.nextImg())
 
 
 	def showPreviousImg(self):
+		print("showPreviousImg")
 		self.showImg(self.gimg_list.previousImg())
-		pass
 
 	def selectImg(self):
 		print("selectImg")
