@@ -5,13 +5,12 @@ Version: v1.0.0
 """
 
 # TODO:
-# img_cnt bug
-# updateGit comment
-
-
-# reorderImgs()
+# folder create
 # img_select
 
+#include another git
+
+# reorderImgs()
 # img check: check in/out
 # auto-check img adding to folder
 # tag & version1
@@ -52,6 +51,9 @@ icon_path = os.path.join(PRO_DIR, "icons")
 from mainwindow import Ui_MainWindow
 
 
+gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
+
+
 class ImgList():
 	"""
 class: provide image list management
@@ -62,32 +64,40 @@ class: provide image list management
 
 	def __init__(self, folder):
 		self.img_dirname = folder
-		self.img_names = self.getContainedImgs(folder)
-		print '\n'.join(['%s:%s' % item for item in self.__dict__.items()])
+		self.imgs_path, self.img_cnt = self.getContainedImgs(folder, type="Recursive")
 
-	def getContainedImgs(self, folder):
-		supported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
-		file_names = []
+	def getContainedImgs(self, folder, type="NotRecursive"):
+		imgs_path = []
+		ret_cnt = 0
 		for root, dirs, filenames in os.walk(folder):
-			for filename in filenames:
-				if not filename.startswith('.'): # not hiden file
-					if filename.split(".")[-1].upper() in supported_img_suffix:
-						file_names.append(filename)
-						self.img_cnt += 1
-		return file_names
+			if type == "Recursive":
+				for filename in filenames:
+					if not filename.startswith('.'): # not hiden file
+						if filename.split(".")[-1].upper() in gSupported_img_suffix:
+							imgs_path.append(os.path.join(root, filename))
+							ret_cnt += 1
+			else:
+				for item in filenames:
+					if not item.startswith('.'): # not hiden file
+						if item.split(".")[-1].upper() in gSupported_img_suffix:
+							imgs_path.append(os.path.join(root, item))
+				ret_cnt = len(imgs_path)
+				break
+		return imgs_path, ret_cnt
+
 
 	def FirstImg(self):
-		return os.path.join(self.img_dirname, self.img_names[0])
+		return os.path.join(self.imgs_path[0])
 
 	def nextImg(self):
 		self.cur_idx += 1
 		self.cur_idx = self.safeLimit(self.cur_idx)
-		return os.path.join(self.img_dirname, self.img_names[self.cur_idx])
+		return os.path.join(self.imgs_path[self.cur_idx])
 
 	def previousImg(self):
 		self.cur_idx -= 1
 		self.cur_idx = self.safeLimit(self.cur_idx)
-		return os.path.join(self.img_dirname, self.img_names[self.cur_idx])
+		return os.path.join(self.imgs_path[self.cur_idx])
 
 	def safeLimit(self, idx):
 		if idx > self.img_cnt-1:
@@ -100,19 +110,16 @@ class: provide image list management
 	def __repr__(self):
 		print '\n'.join(['%s:%s' % item for item in self.__dict__.items()])
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
-	Main Window in Enchain.
-	"""
+Main Window in Enchain.
+"""
 	def __init__(self, parent=None):
 		super(QMainWindow, self).__init__()
 		QMainWindow.__init__(self, parent)
 		self.setupUi(self)
-		self.setup()
-		self.addEvent()
 
-
-	def setup(self):
 		self.setWindowIcon(QIcon(icon_path + ur"/EnchainLogoLittle.png"))
 		self.gFileDialog = QFileDialog()
 		self.graphicsscene = QGraphicsScene()
@@ -126,8 +133,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.setupToolbar()
 		self.setupButtons()
 		self.setupStatusbar()
-
-
 
 	def setupMenubar(self):
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
@@ -168,15 +173,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		actionSelect.triggered.connect(self.selectImg)
 		self.toolbar.addAction(actionSelect)
 
-
 	def setupButtons(self):
 			pass
 
 	def setupStatusbar(self):
 		self.statusBar().showMessage("Ready")
 
-	def addEvent(self):
-		print("addEvent")
 
 	def printToStatus(self, message):
 		self.statusBar().showMessage(message)
@@ -192,6 +194,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.showImg(img_path[0])
 
 	def showImg(self, img_path):
+		print(img_path)
 		self.gImage = cv2.imread(img_path)
 		self.currentCvImage = None  # reset
 		self.currentCvImage = self.gImage.copy()
@@ -230,9 +233,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.gWorkspace = folder_path
 
 		self.gimg_list = ImgList(self.gWorkspace)
-		# print(self.gimg_list)
 		self.showImg(self.gimg_list.FirstImg())
-
 
 	def showNextImg(self):
 		print("showNextImg")
@@ -245,7 +246,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def selectImg(self):
 		print("selectImg")
-		pass
 
 
 	def convert_CvImgToQPixmap(self, cvImage):
@@ -272,14 +272,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		except:
 			print("No Image!")
 
-	def getContainedFiles(self, folder):
+	def getContainedFiles(self, folder, type="NotRecursive"):
 		file_names = []
+		ret_cnt = 0
 		for root, dirs, filenames in os.walk(folder):
-			for filename in filenames:
-				if not filename.startswith('.'): # not hiden file
-					file_names.append(filename)
-		return file_names
-
+			if type == "Recursive":
+				for filename in filenames:
+					if not filename.startswith('.'): # not hiden file
+						file_names.append(os.path.join(root, filename))
+						ret_cnt += 1
+			else:
+				for item in filenames:
+					if not item.startswith('.'): # not hiden file
+						file_names.append(os.path.join(root, item))
+				ret_cnt = len(file_names)
+				break
+		return file_names, ret_cnt
 
 	def closeEvent(self, event):
 		if Debug:
