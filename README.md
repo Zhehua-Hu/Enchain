@@ -8,7 +8,7 @@ It is a guidance/pipeline to prepare your own dataset.
 ## Dataset Generation Procedure
 
 
-![](./doc/docPictures/DatasetGenerationProcedure.svg)
+![](./doc/docPictures/DatasetGenerationProcedure.png)
 ## Installation
 
 * Binary Execuable File
@@ -18,6 +18,8 @@ It is a guidance/pipeline to prepare your own dataset.
     ```
     blabla...
     ```
+
+
 ## Usage
 
 
