@@ -5,6 +5,8 @@ Enchain is a versatile imag**E** labelli**N**g tool**CHAIN** for deep learning.
 It is a guidance/pipeline to prepare your own dataset.
 
 
+## Dataset Generation Procedure
+![](./doc/docPictures/DatasetGenerationProcedure.svg
 
 ## Download
 
