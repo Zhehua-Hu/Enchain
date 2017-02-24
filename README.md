@@ -6,9 +6,10 @@ It is a guidance/pipeline to prepare your own dataset.
 
 
 ## Dataset Generation Procedure
-![](./doc/docPictures/DatasetGenerationProcedure.svg
 
-## Download
+
+![](./doc/docPictures/DatasetGenerationProcedure.svg)
+## Installation
 
 * Binary Execuable File
     - [Windows]() (Tested on win7)
@@ -27,13 +28,15 @@ It is a guidance/pipeline to prepare your own dataset.
 * PyQt5.8
 
 
-
+# Join us!
 
 ## Acknowladgement
 
 Icons:https://github.com/Templarian/MaterialDesign
 
+##License
 
+## Related
 
 
 
