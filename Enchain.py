@@ -5,53 +5,75 @@ Version: v1.0.0
 """
 
 # TODO:
-# folder create
+# cross-platform run
+# setSavefolder
+# video_slice(name format)
 # img_select
+# img_delete
 
-#include another git
 
-# reorderImgs()
+
 # img check: check in/out
-# auto-check img adding to folder
-# tag & version1
+"""
+    read_folder
+        img & xml
+        draw rect on img
+        show img
+    ok->done
+    wrong->error-select
+        ->(TODO)redraw
+        rewrite xml
+"""
 
+# tag & version1
 # read labelImg
 
-# Debug
-Debug = True
-if Debug:
-	pass
-else:
-	pass
+# video_select
+# reorderImgs()
+# auto-check img adding to folder
+# dataset manage & stat
 
-# opencv
+# std libs
+import sys
+import os
+import numpy as np
+
+"""
+Global Macros
+"""
+import platform
+if "Windows" in platform.system():
+	# Set it if need
+	# PRO_DIR = r"H:\Clouds\pythonPro\A_Github\Enchain"
+	PRO_DIR = os.environ.get("ENCHAINPATH")
+else:
+	# PRO_DIR = r"/home/zhehua/pythonPro/A_Github/Enchain"
+	# PRO_DIR = os.environ.get("ENCHAINPATH")
+	PRO_DIR = os.path.dirname(__file__)
+print PRO_DIR
+Debug = True
+gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
+
+
+
+# OpenCV
 import cv2
-# qt
+# PyQt
 from PyQt5.QtWidgets import QApplication, qApp,\
 	QMainWindow, QWidget, QFileDialog, QGraphicsScene,\
 	QGraphicsPixmapItem, QMessageBox, QAction
 
 from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import Qt
-# Misc
-import sys
-import os
-import numpy as np
-import platform
-if "Windows" in platform.system():
-	# Set it if need
-	PRO_DIR = ur"H:\Clouds\pythonPro\A_Github\Enchain"
-else:
-	PRO_DIR = os.path.dirname(__file__)
+
 
 file_path = os.path.join(PRO_DIR, "ui")
 sys.path.append(file_path)
 icon_path = os.path.join(PRO_DIR, "icons")
 
-from mainwindow import Ui_MainWindow
+from ui.mainwindow import Ui_MainWindow
 
 
-gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
 
 
 class ImgList():
@@ -108,7 +130,8 @@ class: provide image list management
 			return idx
 
 	def __repr__(self):
-		print '\n'.join(['%s:%s' % item for item in self.__dict__.items()])
+		for item in self.__dict__.items():
+			print("%s : %s" % item)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -120,7 +143,7 @@ Main Window in Enchain.
 		QMainWindow.__init__(self, parent)
 		self.setupUi(self)
 
-		self.setWindowIcon(QIcon(icon_path + ur"/EnchainLogoLittle.png"))
+		self.setWindowIcon(QIcon(icon_path + u"/EnchainLogoLittle.png"))
 		self.gFileDialog = QFileDialog()
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
@@ -138,38 +161,38 @@ Main Window in Enchain.
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
 
 
-		self.actionQuit.setIcon(QIcon(icon_path + ur"/close-circle.svg"))
-		self.actionQuit.setShortcut(ur"Ctrl+Q")
-		self.actionQuit.setStatusTip(ur"Quit Software")
+		self.actionQuit.setIcon(QIcon(icon_path + u"/close-circle.svg"))
+		self.actionQuit.setShortcut(u"Ctrl+Q")
+		self.actionQuit.setStatusTip(u"Quit Software")
 		self.actionQuit.triggered.connect(qApp.quit)
 
-		self.actionClose.setStatusTip(ur"Close File")
+		self.actionClose.setStatusTip(u"Close File")
 		self.actionClose.triggered.connect(self.clearView)
 
-		self.actionOpenImage.setStatusTip(ur"Open Single Image")
+		self.actionOpenImage.setStatusTip(u"Open Single Image")
 		self.actionOpenImage.triggered.connect(self.openImage)
 
-		self.actionSaveImage.setStatusTip(ur"Save Image")
+		self.actionSaveImage.setStatusTip(u"Save Image")
 		self.actionSaveImage.triggered.connect(self.SaveImage)
 
-		self.actionSaveImage.setStatusTip(ur"Open Folder Contains Images")
+		self.actionSaveImage.setStatusTip(u"Open Folder Contains Images")
 		self.actionOpenFolder.triggered.connect(self.setWorkspace)
 
 	def setupToolbar(self):
-		self.toolbar = self.addToolBar(ur"maintoolbar")
+		self.toolbar = self.addToolBar(u"maintoolbar")
 
-		actionPrevious = QAction(QIcon(icon_path + ur"/arrow-left-bold-circle.svg"), ur"Previous", self)
-		actionPrevious.setShortcut(ur"Ctrl+LeftArrow")
+		actionPrevious = QAction(QIcon(icon_path + u"/arrow-left-bold-circle.svg"), u"Previous", self)
+		actionPrevious.setShortcut(u"Ctrl+LeftArrow")
 		actionPrevious.triggered.connect(self.showPreviousImg)
 		self.toolbar.addAction(actionPrevious)
 		
-		actionNext = QAction(QIcon(icon_path + ur"/arrow-right-bold-circle.svg"), ur"Next", self)
-		actionNext.setShortcut(ur"Ctrl+N")
+		actionNext = QAction(QIcon(icon_path + u"/arrow-right-bold-circle.svg"), u"Next", self)
+		actionNext.setShortcut(u"Ctrl+N")
 		actionNext.triggered.connect(self.showNextImg)
 		self.toolbar.addAction(actionNext)
 		
-		actionSelect = QAction(QIcon(icon_path + ur"/check-circle.svg"), ur"Select", self)
-		actionSelect.setShortcut(ur"Ctrl+Enter")
+		actionSelect = QAction(QIcon(icon_path + u"/check-circle.svg"), u"Select", self)
+		actionSelect.setShortcut(u"Ctrl+Enter")
 		actionSelect.triggered.connect(self.selectImg)
 		self.toolbar.addAction(actionSelect)
 
@@ -185,11 +208,11 @@ Main Window in Enchain.
 
 	def openImage(self):
 		if Debug:
-			openImage_path = os.path.join(PRO_DIR, ur"test/img_folder")
+			openImage_path = os.path.join(PRO_DIR, u"test/img_folder")
 		else:
-			openImage_path = os.path.expanduser(ur"~")
+			openImage_path = os.path.expanduser(u"~")
 
-		img_path = self.gFileDialog.getOpenFileName(self, ur"Open File", openImage_path)
+		img_path = self.gFileDialog.getOpenFileName(self, u"Open File", openImage_path)
 		if img_path[0]:
 			self.showImg(img_path[0])
 
@@ -224,11 +247,11 @@ Main Window in Enchain.
 
 	def setWorkspace(self):
 		if Debug:
-			setWorkspace_path = os.path.join(PRO_DIR, ur"test/")
+			setWorkspace_path = os.path.join(PRO_DIR, u"test/")
 		else:
-			setWorkspace_path = os.path.expanduser(ur"~")
+			setWorkspace_path = os.path.expanduser(u"~")
 
-		folder_path = self.gFileDialog.getExistingDirectory(self, ur"Open Folder", setWorkspace_path)
+		folder_path = self.gFileDialog.getExistingDirectory(self, u"Open Folder", setWorkspace_path)
 		if folder_path is not None:
 			self.gWorkspace = folder_path
 
