@@ -1,0 +1,3 @@
+pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
+
+./buildtools/pyinstaller/pyinstaller.py -F --specpath ./build/ ./Enchain.py
