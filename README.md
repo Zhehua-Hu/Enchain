@@ -22,6 +22,8 @@ It is a guidance/pipeline to prepare your own dataset.
 
 ## Usage
 
+### Steps
+
 
 ## Development Environment
 * Ubuntu 16.04.1 LTS x64

@@ -17,8 +17,8 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>100</y>
+      <x>20</x>
+      <y>20</y>
       <width>720</width>
       <height>480</height>
      </rect>
@@ -27,8 +27,8 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>840</x>
-      <y>570</y>
+      <x>780</x>
+      <y>620</y>
       <width>231</width>
       <height>23</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>740</x>
-      <y>70</y>
+      <x>760</x>
+      <y>640</y>
       <width>321</width>
       <height>27</height>
      </rect>
@@ -71,32 +71,73 @@
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
-     <string>Tools</string>
+     <string>Labelling</string>
     </property>
-    <addaction name="actionRename"/>
-    <addaction name="actionCutImage"/>
-   </widget>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpenFolder"/>
-    <addaction name="actionOpenVideo"/>
-    <addaction name="actionOpenImage"/>
-    <addaction name="actionSaveImage"/>
-    <addaction name="actionClose"/>
-    <addaction name="actionQuit"/>
+    <addaction name="actionShow_guidance"/>
    </widget>
    <widget class="QMenu" name="menuPipeline">
     <property name="title">
-     <string>Pipeline</string>
+     <string>Project</string>
     </property>
-    <addaction name="actionDatasetInput"/>
+    <addaction name="actionCreate"/>
     <addaction name="actionSetUserInfo"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionCutImage"/>
+    <addaction name="actionRename"/>
+   </widget>
+   <widget class="QMenu" name="menuManagement">
+    <property name="title">
+     <string>Management</string>
+    </property>
+    <addaction name="actionDatasetInput"/>
+   </widget>
+   <widget class="QMenu" name="menuPreprocess">
+    <property name="title">
+     <string>Preprocess</string>
+    </property>
+    <widget class="QMenu" name="menuImages">
+     <property name="title">
+      <string>Images</string>
+     </property>
+     <addaction name="actionOpenFolder"/>
+     <addaction name="actionOpenImage"/>
+     <addaction name="actionSaveImage"/>
+    </widget>
+    <widget class="QMenu" name="menuVideo">
+     <property name="title">
+      <string>Video</string>
+     </property>
+     <addaction name="actionOpenVideo"/>
+     <addaction name="actionVideoSlice"/>
+    </widget>
+    <widget class="QMenu" name="menuSelection">
+     <property name="title">
+      <string>Selection</string>
+     </property>
+     <addaction name="actionSelectSource"/>
+     <addaction name="actionSelectDestination"/>
+    </widget>
+    <addaction name="menuVideo"/>
+    <addaction name="menuImages"/>
+    <addaction name="separator"/>
+    <addaction name="actionDataCleansing"/>
+    <addaction name="separator"/>
+    <addaction name="menuSelection"/>
+    <addaction name="separator"/>
+    <addaction name="actionAssignment"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionQuit"/>
+   </widget>
    <addaction name="menuPipeline"/>
-   <addaction name="menuFile"/>
+   <addaction name="menuPreprocess"/>
    <addaction name="menuTool"/>
+   <addaction name="menuManagement"/>
+   <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -132,7 +173,7 @@
   </action>
   <action name="actionInfo">
    <property name="text">
-    <string>Info</string>
+    <string>About</string>
    </property>
   </action>
   <action name="actionRename">
@@ -183,6 +224,51 @@
   <action name="actionSetUserInfo">
    <property name="text">
     <string>SetUserInfo</string>
+   </property>
+  </action>
+  <action name="actionShow_guidance">
+   <property name="text">
+    <string>Guidance Wiki</string>
+   </property>
+  </action>
+  <action name="actionVideo">
+   <property name="text">
+    <string>video</string>
+   </property>
+  </action>
+  <action name="actionVideo_2">
+   <property name="text">
+    <string>Video</string>
+   </property>
+  </action>
+  <action name="actionCreate">
+   <property name="text">
+    <string>Create</string>
+   </property>
+  </action>
+  <action name="actionVideoSlice">
+   <property name="text">
+    <string>VideoSlice</string>
+   </property>
+  </action>
+  <action name="actionDataCleansing">
+   <property name="text">
+    <string>DataCleansing</string>
+   </property>
+  </action>
+  <action name="actionSelectSource">
+   <property name="text">
+    <string>SelectSource</string>
+   </property>
+  </action>
+  <action name="actionSelectDestination">
+   <property name="text">
+    <string>SelectDestination</string>
+   </property>
+  </action>
+  <action name="actionAssignment">
+   <property name="text">
+    <string>Assignment</string>
    </property>
   </action>
  </widget>

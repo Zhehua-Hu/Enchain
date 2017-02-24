@@ -1,18 +1,15 @@
 
-# Tiny Demo First
+## tools
+Readme step tag!
 
-Page 1
-* **image_select**
-    
+img to video
+<!-- fourcc = cv2.cv.CV_FOURCC('I','4','2','0') -->
+<!-- fps = 30 -->
+<!-- (cols, rows) = (640, 480) -->
+<!-- videoWriter = cv2.VideoWriter(outputpath,fourcc, fps, (cols, rows)) -->
 
 
-Page 2 Guandance
-LabelImg
-
-Page 3 Guandance
-image_check
-
-    
+  
         
 
 

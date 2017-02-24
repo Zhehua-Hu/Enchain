@@ -4,17 +4,21 @@
 Version: v1.0.0
 """
 
-# TODO:
+# TODO[BUG]:
+# open img folder&exit will cause error
 # cross-platform run
-# setSavefolder
-# video_slice(name format)
-# img_select
-# img_delete
+	## copy pyinstaller
+# video_show format bug
 
+"""
+# TODO[FUNC]:
+# img_delete will reorder img
+# reorderImgs()
+# Hotkey
 
+# read labelImg use drawing!
 
 # img check: check in/out
-"""
     read_folder
         img & xml
         draw rect on img
@@ -23,19 +27,21 @@ Version: v1.0.0
     wrong->error-select
         ->(TODO)redraw
         rewrite xml
-"""
 
 # tag & version1
-# read labelImg
+
+
 
 # video_select
-# reorderImgs()
 # auto-check img adding to folder
 # dataset manage & stat
+
+"""
 
 # std libs
 import sys
 import os
+import shutil
 import numpy as np
 
 """
@@ -68,13 +74,11 @@ from PyQt5.QtCore import Qt
 
 
 file_path = os.path.join(PRO_DIR, "ui")
-sys.path.append(file_path)
+# sys.path.append(file_path)
 icon_path = os.path.join(PRO_DIR, "icons")
 
 from ui.mainwindow import Ui_MainWindow
-
-
-
+from libs.videoSlice import videoSlice, showVideoInfo
 
 class ImgList():
 	"""
@@ -109,17 +113,20 @@ class: provide image list management
 
 
 	def FirstImg(self):
-		return os.path.join(self.imgs_path[0])
+		return self.imgs_path[0]
 
 	def nextImg(self):
 		self.cur_idx += 1
 		self.cur_idx = self.safeLimit(self.cur_idx)
-		return os.path.join(self.imgs_path[self.cur_idx])
+		return self.imgs_path[self.cur_idx]
 
 	def previousImg(self):
 		self.cur_idx -= 1
 		self.cur_idx = self.safeLimit(self.cur_idx)
-		return os.path.join(self.imgs_path[self.cur_idx])
+		return self.imgs_path[self.cur_idx]
+	
+	def getImgPath(self):
+		return self.imgs_path[self.cur_idx]
 
 	def safeLimit(self, idx):
 		if idx > self.img_cnt-1:
@@ -137,6 +144,7 @@ class: provide image list management
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
 Main Window in Enchain.
+backend image process: gCVimg using OpenCV
 """
 	def __init__(self, parent=None):
 		super(QMainWindow, self).__init__()
@@ -148,9 +156,20 @@ Main Window in Enchain.
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
 
-		self.gImage = None
-		self.gWorkspace = None
-		self.gimg_list = None
+		self.gCVimg = None
+		self.gQpixmap = None
+		self.gQimg = None
+		self.gVideo = None
+		self.gVidDesFolder = None
+		self.gSelectSourceFolder = None
+		self.gSelectSource_exist = False
+		self.gImgList = None
+		self.gImgList_exist = False
+
+		self.gSelectDestinationFolder = None
+		self.gSelectDestination_exist = False
+
+
 
 		self.setupMenubar()
 		self.setupToolbar()
@@ -161,22 +180,41 @@ Main Window in Enchain.
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
 
 
-		self.actionQuit.setIcon(QIcon(icon_path + u"/close-circle.svg"))
+		self.actionQuit.setIcon(QIcon(icon_path + u"/exit-to-app.svg"))
 		self.actionQuit.setShortcut(u"Ctrl+Q")
 		self.actionQuit.setStatusTip(u"Quit Software")
 		self.actionQuit.triggered.connect(qApp.quit)
 
+		self.actionClose.setIcon(QIcon(icon_path + u"/close-circle.svg"))
 		self.actionClose.setStatusTip(u"Close File")
 		self.actionClose.triggered.connect(self.clearView)
 
+		self.actionOpenImage.setIcon(QIcon(icon_path + u"/image-area.svg"))
 		self.actionOpenImage.setStatusTip(u"Open Single Image")
 		self.actionOpenImage.triggered.connect(self.openImage)
 
 		self.actionSaveImage.setStatusTip(u"Save Image")
-		self.actionSaveImage.triggered.connect(self.SaveImage)
+		self.actionSaveImage.triggered.connect(self.saveImageFromBackendCVimg)
 
-		self.actionSaveImage.setStatusTip(u"Open Folder Contains Images")
-		self.actionOpenFolder.triggered.connect(self.setWorkspace)
+		self.actionOpenFolder.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionOpenFolder.setStatusTip(u"Open Folder Contains Images")
+		self.actionOpenFolder.triggered.connect(self.setSelectSourceFolder)
+
+		self.actionOpenVideo.setIcon(QIcon(icon_path + u"/video.svg"))
+		self.actionOpenVideo.setStatusTip(u"Open Folder Contains Images")
+		self.actionOpenVideo.triggered.connect(self.setVideo)
+
+		self.actionVideoSlice.setIcon(QIcon(icon_path + u"/animation.svg"))
+		self.actionVideoSlice.setStatusTip(u"Slice Video TO Images")
+		self.actionVideoSlice.triggered.connect(self.videoSliceToFolder)
+
+		self.actionSelectSource.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionSelectSource.setStatusTip(u"Open Folder Contains Source Images")
+		self.actionSelectSource.triggered.connect(self.setSelectSourceFolder)
+
+		self.actionSelectDestination.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionSelectDestination.setStatusTip(u"Open Folder To Save Selected Images")
+		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
 	def setupToolbar(self):
 		self.toolbar = self.addToolBar(u"maintoolbar")
@@ -196,15 +234,20 @@ Main Window in Enchain.
 		actionSelect.triggered.connect(self.selectImg)
 		self.toolbar.addAction(actionSelect)
 
+		actionDelete = QAction(QIcon(icon_path + u"/delete-circle.svg"), u"Delete", self)
+		actionDelete.setShortcut(u"Ctrl+Delete")
+		actionDelete.triggered.connect(self.deleteImg)
+		self.toolbar.addAction(actionDelete)
+
 	def setupButtons(self):
 			pass
 
 	def setupStatusbar(self):
 		self.statusBar().showMessage("Ready")
 
-
 	def printToStatus(self, message):
 		self.statusBar().showMessage(message)
+
 
 	def openImage(self):
 		if Debug:
@@ -212,22 +255,26 @@ Main Window in Enchain.
 		else:
 			openImage_path = os.path.expanduser(u"~")
 
-		img_path = self.gFileDialog.getOpenFileName(self, u"Open File", openImage_path)
-		if img_path[0]:
-			self.showImg(img_path[0])
+		choosed_path = self.gFileDialog.getOpenFileName(self, u"Open File", openImage_path)
+		if choosed_path[0]:
+			self.showImgFromPath(choosed_path[0])
 
-	def showImg(self, img_path):
-		print(img_path)
-		self.gImage = cv2.imread(img_path)
-		self.currentCvImage = None  # reset
-		self.currentCvImage = self.gImage.copy()
+	def showImgFromPath(self, img_path):
+		if Debug:
+			print("showImgFromPath")
+			print(img_path)
+
 		pixmap = QPixmap(img_path)
 		self.updateView(pixmap)
 
-	def getPixmap(self, img_path):
-		self.gImage = cv2.imread(img_path)
-		self.currentCvImage = None  # reset
-		self.currentCvImage = self.gImage.copy()
+	def showImgFromCvimg(self, CVimg):
+		if Debug:
+			print("showImgFromCvimg")
+		self.updateView(self.convert_CVimgToQpixmap(CVimg))
+
+	def getPixmapFromPath(self, img_path):
+		if Debug:
+			print("getPixmapFromPath")
 		pixmap = QPixmap(img_path)
 		return pixmap
 
@@ -245,51 +292,140 @@ Main Window in Enchain.
 		for item in items:
 			self.graphicsscene.removeItem(item)
 
-	def setWorkspace(self):
+	def setSelectSourceFolder(self):
 		if Debug:
-			setWorkspace_path = os.path.join(PRO_DIR, u"test/")
+			print("setSelectSourceFolder")
+			tmp_path = os.path.join(PRO_DIR, u"test/")
 		else:
-			setWorkspace_path = os.path.expanduser(u"~")
+			tmp_path = os.path.expanduser(u"~")
 
-		folder_path = self.gFileDialog.getExistingDirectory(self, u"Open Folder", setWorkspace_path)
-		if folder_path is not None:
-			self.gWorkspace = folder_path
+		if self.gSelectSource_exist:
+			print("Select Source Has Set!")
+			
+		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
+		
+		if Debug:
+			print(choosed_folder)
+			print(choosed_folder[0])
+			
+		if choosed_folder is not None:
+			self.gSelectSourceFolder = choosed_folder
 
-		self.gimg_list = ImgList(self.gWorkspace)
-		self.showImg(self.gimg_list.FirstImg())
+		self.gImgList = ImgList(self.gSelectSourceFolder)
+		self.gSelectSource_exist = True
+		self.gImgList_exist = True
+		if self.gImgList_exist:
+			self.showImgFromPath(self.gImgList.FirstImg())
 
 	def showNextImg(self):
-		print("showNextImg")
-		self.showImg(self.gimg_list.nextImg())
-
+		if Debug:
+			print("showNextImg")
+		if self.gImgList_exist:
+			self.showImgFromPath(self.gImgList.nextImg())
 
 	def showPreviousImg(self):
-		print("showPreviousImg")
-		self.showImg(self.gimg_list.previousImg())
+		if Debug:
+			print("showPreviousImg")
+		if self.gImgList_exist:
+			self.showImgFromPath(self.gImgList.previousImg())
+
+
+	def setVideo(self):
+		if Debug:
+			print("setVideo")
+			openVideo_path = os.path.join(PRO_DIR, u"test/video_folder")
+		else:
+			openVideo_path = os.path.expanduser(u"~")
+
+		choosed_path = self.gFileDialog.getOpenFileName(self, u"Open File", openVideo_path)
+
+		if choosed_path[0] is not None:
+			self.gVideo = choosed_path[0]
+			vhandle, fps, size, firstframe = showVideoInfo(choosed_path[0])
+			self.showImgFromCvimg(firstframe)
+
+	def videoSliceToFolder(self):
+		if Debug:
+			print("videoSlice")
+			videoSlice_path = os.path.join(PRO_DIR, u"test/")
+		else:
+			videoSlice_path = os.path.expanduser(u"~")
+
+		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", videoSlice_path)
+		if choosed_folder is not None:
+			self.gVidDesFolder = choosed_folder
+
+		videoSlice(self.gVideo, self.gVidDesFolder, "png")
+
+
+	def setSelectDestinationFolder(self):
+		if Debug:
+			print("setSelectDestinationFolder")
+			tmp_path = os.path.join(PRO_DIR, u"test/")
+		else:
+			tmp_path = os.path.expanduser(u"~")
+
+		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
+		if choosed_folder[0] is not None:
+			self.gSelectDestinationFolder = choosed_folder
+			self.gSelectDestination_exist = True
+		# TODO: pop info if img folder has opened
 
 	def selectImg(self):
-		print("selectImg")
+		if Debug:
+			print("selectImg")
+		if self.gSelectDestination_exist:
+			print(self.gImgList.cur_idx)
+			print(self.gImgList.getImgPath())
 
+			img_src = self.gImgList.getImgPath()
+			# img_des = os.path.join(self.gSelectDestinationFolder, os.path.basename(img_src))
 
-	def convert_CvImgToQPixmap(self, cvImage):
-		height, width, dim = cvImage.shape
+			img_des = self.gSelectDestinationFolder
+			print img_src, img_des
+			shutil.copy(img_src, self.gSelectDestinationFolder)
+		else:
+			print("Did not set Select Destination!")
+
+	def deleteImg(self):
+		if Debug:
+			print("deleteImg")
+		if self.gSelectDestination_exist:
+			print(self.gImgList.cur_idx)
+		else:
+			print("Did not set Select Destination!")
+
+	def convert_CVimgToQpixmap(self, CVimg):
+		height, width, dim = CVimg.shape
 		bytesPerLine = dim * width
-		qimg = QImage(cvImage.data, width, height, bytesPerLine, QImage.Format_RGB888)
+		qimg = QImage(CVimg.data, width, height, bytesPerLine, QImage.Format_RGB888)
 		return QPixmap.fromImage(qimg)
 
-	def convert_CvImgToQImg(self, cvImage):
-		height, width, dim = cvImage.shape
+	def convert_CVimgToQimg(self, CVimg):
+		height, width, dim = CVimg.shape
 		bytesPerLine = dim * width
-		qimg = QImage(cvImage.data, width, height, bytesPerLine, QImage.Format_RGB888)
+		qimg = QImage(CVimg.data, width, height, bytesPerLine, QImage.Format_RGB888)
 		return qimg
 
-	def SaveImage(self):
+	def saveImageFromBackendCVimg(self):
 		default_name = "test.jpg"
 		try:
-			if self.currentCvImage is not None:
-				file = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
-				if file[0]:
-					cv2.imwrite(file[0],self.currentCvImage)
+			if self.gCVimg is not None:
+				choosed_path = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
+				if choosed_path[0]:
+					cv2.imwrite(choosed_path[0], self.gCVimg)
+			else:
+				print("Empty!")
+		except:
+			print("No Image!")
+
+	def saveImageFromCVimg(self, CVimg):
+		default_name = "test.jpg"
+		try:
+			if self.gCVimg is not None:
+				choosed_path = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
+				if choosed_path[0]:
+					cv2.imwrite(choosed_path[0], CVimg)
 			else:
 				print("Empty!")
 		except:
