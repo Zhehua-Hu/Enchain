@@ -54,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>1080</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -146,21 +146,6 @@
     <string>Author Info</string>
    </property>
   </action>
-  <action name="actionAbout_Enchain">
-   <property name="text">
-    <string>About Enchain</string>
-   </property>
-  </action>
-  <action name="actionOpen">
-   <property name="text">
-    <string>OpenFolder</string>
-   </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>Quit</string>
-   </property>
-  </action>
   <action name="actionOnline_Help">
    <property name="text">
     <string>Online Help</string>
@@ -229,16 +214,6 @@
   <action name="actionShow_guidance">
    <property name="text">
     <string>Guidance Wiki</string>
-   </property>
-  </action>
-  <action name="actionVideo">
-   <property name="text">
-    <string>video</string>
-   </property>
-  </action>
-  <action name="actionVideo_2">
-   <property name="text">
-    <string>Video</string>
    </property>
   </action>
   <action name="actionCreate">

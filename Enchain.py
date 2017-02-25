@@ -7,14 +7,14 @@ Version: v1.0.0
 # TODO[BUG]:
 # open img folder&exit will cause error
 # cross-platform run
-	## copy pyinstaller
+	## windows
+	## Ubuntu
 # video_show format bug
 
 """
 # TODO[FUNC]:
 # img_delete will reorder img
 # reorderImgs()
-# Hotkey
 
 # read labelImg use drawing!
 
@@ -220,17 +220,17 @@ backend image process: gCVimg using OpenCV
 		self.toolbar = self.addToolBar(u"maintoolbar")
 
 		actionPrevious = QAction(QIcon(icon_path + u"/arrow-left-bold-circle.svg"), u"Previous", self)
-		actionPrevious.setShortcut(u"Ctrl+LeftArrow")
+		actionPrevious.setShortcut(u"Ctrl+Left")
 		actionPrevious.triggered.connect(self.showPreviousImg)
 		self.toolbar.addAction(actionPrevious)
 		
 		actionNext = QAction(QIcon(icon_path + u"/arrow-right-bold-circle.svg"), u"Next", self)
-		actionNext.setShortcut(u"Ctrl+N")
+		actionNext.setShortcut(u"Ctrl+Right")
 		actionNext.triggered.connect(self.showNextImg)
 		self.toolbar.addAction(actionNext)
 		
 		actionSelect = QAction(QIcon(icon_path + u"/check-circle.svg"), u"Select", self)
-		actionSelect.setShortcut(u"Ctrl+Enter")
+		actionSelect.setShortcut(u"Ctrl+Return")
 		actionSelect.triggered.connect(self.selectImg)
 		self.toolbar.addAction(actionSelect)
 

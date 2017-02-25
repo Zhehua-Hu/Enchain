@@ -1,3 +1,15 @@
 pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
 
 ./buildtools/pyinstaller/pyinstaller.py -F --specpath ./build/ ./Enchain.py
+
+
+
+
+
+pyinstaller.exe -F -w -c -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py
+#or
+pyinstaller.exe -F -w -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py
+
+
+cd C:\Python27\Lib\site-packages\PyQt5\uic
+pyuic.py H:\Clouds\pythonPro\A_Github\Enchainui\mainwindow.ui -o H:\Clouds\pythonPro\A_Github\Enchainui\ui\mainwindow.py
