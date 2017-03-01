@@ -6,18 +6,17 @@ Version: v1.0.0
 
 # TODO[BUG]:
 # open img folder&exit will cause error
-# cross-platform run
-	## windows
-	## Ubuntu
 # video_show format bug
+
+
+# cross-platform run
+	## windows[ok]
+	## Ubuntu[skip]
+
 
 """
 # TODO[FUNC]:
-# img_delete will reorder img
-# reorderImgs()
-
 # read labelImg use drawing!
-
 # img check: check in/out
     read_folder
         img & xml
@@ -28,14 +27,19 @@ Version: v1.0.0
         ->(TODO)redraw
         rewrite xml
 
-# tag & version1
+# img_delete will reorder img
+# git tag & version1
+
+# Normalize
+#add icon,tip,shortcut
+#show status
 
 
 
-# video_select
 # auto-check img adding to folder
 # dataset manage & stat
 
+# video_select( video player)
 """
 
 # std libs
@@ -47,20 +51,19 @@ import numpy as np
 """
 Global Macros
 """
-import platform
-if "Windows" in platform.system():
-	# Set it if need
-	# PRO_DIR = r"H:\Clouds\pythonPro\A_Github\Enchain"
-	PRO_DIR = os.environ.get("ENCHAINPATH")
-else:
-	# PRO_DIR = r"/home/zhehua/pythonPro/A_Github/Enchain"
-	# PRO_DIR = os.environ.get("ENCHAINPATH")
-	PRO_DIR = os.path.dirname(__file__)
+# import platform
+# if "Windows" in platform.system():
+# 	PRO_DIR = os.environ.get("ENCHAINPATH")
+# else:
+# 	PRO_DIR = os.environ.get("ENCHAINPATH")
+PRO_DIR = os.environ.get("ENCHAINPATH")
 print PRO_DIR
 Debug = True
 gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
 
-
+projectLink = "https://github.com/Zhehua-Hu/Enchain"
+onlineHelpLink = "https://github.com/Zhehua-Hu/Enchain/wiki"
+author_blog = "http://zhehua.info"
 
 # OpenCV
 import cv2
@@ -69,8 +72,10 @@ from PyQt5.QtWidgets import QApplication, qApp,\
 	QMainWindow, QWidget, QFileDialog, QGraphicsScene,\
 	QGraphicsPixmapItem, QMessageBox, QAction
 
-from PyQt5.QtGui import QPixmap, QImage, QIcon
-from PyQt5.QtCore import Qt
+
+from PyQt5.QtGui import QPixmap, QImage, QIcon, QDesktopServices
+from PyQt5.QtCore import Qt, QUrl
+# from PyQt5.QtWebKit import QWebView
 
 
 file_path = os.path.join(PRO_DIR, "ui")
@@ -82,8 +87,8 @@ from libs.videoSlice import videoSlice, showVideoInfo
 
 class ImgList():
 	"""
-class: provide image list management
-"""
+	class: provide image list management
+    """
 
 	cur_idx = 0
 	img_cnt = 0
@@ -93,6 +98,7 @@ class: provide image list management
 		self.imgs_path, self.img_cnt = self.getContainedImgs(folder, type="Recursive")
 
 	def getContainedImgs(self, folder, type="NotRecursive"):
+		imgs_name = []
 		imgs_path = []
 		ret_cnt = 0
 		for root, dirs, filenames in os.walk(folder):
@@ -100,15 +106,19 @@ class: provide image list management
 				for filename in filenames:
 					if not filename.startswith('.'): # not hiden file
 						if filename.split(".")[-1].upper() in gSupported_img_suffix:
-							imgs_path.append(os.path.join(root, filename))
+							imgs_name.append(filename)
 							ret_cnt += 1
 			else:
-				for item in filenames:
-					if not item.startswith('.'): # not hiden file
-						if item.split(".")[-1].upper() in gSupported_img_suffix:
-							imgs_path.append(os.path.join(root, item))
-				ret_cnt = len(imgs_path)
+				for filename in filenames:
+					if not filename.startswith('.'): # not hiden file
+						if filename.split(".")[-1].upper() in gSupported_img_suffix:
+							imgs_name.append(filename)
+				ret_cnt = len(imgs_name)
 				break
+
+		imgs_name.sort()  # from 000001 to increase
+		for item in imgs_name:
+			imgs_path.append(os.path.join(self.img_dirname, item))
 		return imgs_path, ret_cnt
 
 
@@ -153,6 +163,7 @@ backend image process: gCVimg using OpenCV
 
 		self.setWindowIcon(QIcon(icon_path + u"/EnchainLogoLittle.png"))
 		self.gFileDialog = QFileDialog()
+		self.gMesssage = QMessageBox()
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
 
@@ -216,16 +227,26 @@ backend image process: gCVimg using OpenCV
 		self.actionSelectDestination.setStatusTip(u"Open Folder To Save Selected Images")
 		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
+
+		self.actionDataCleansing.triggered.connect(self.todoInfo)
+
+		self.actionOnline_Help.triggered.connect(self.onlineHelp)
+		self.actionAbout_Enchain.triggered.connect(self.about_Enchain)
+		self.actionAbout_Qt.triggered.connect(self.aboutQt)
+
+
+
+
 	def setupToolbar(self):
 		self.toolbar = self.addToolBar(u"maintoolbar")
 
 		actionPrevious = QAction(QIcon(icon_path + u"/arrow-left-bold-circle.svg"), u"Previous", self)
-		actionPrevious.setShortcut(u"Ctrl+Left")
+		actionPrevious.setShortcut(u"Left")
 		actionPrevious.triggered.connect(self.showPreviousImg)
 		self.toolbar.addAction(actionPrevious)
 		
 		actionNext = QAction(QIcon(icon_path + u"/arrow-right-bold-circle.svg"), u"Next", self)
-		actionNext.setShortcut(u"Ctrl+Right")
+		actionNext.setShortcut(u"Right")
 		actionNext.triggered.connect(self.showNextImg)
 		self.toolbar.addAction(actionNext)
 		
@@ -258,6 +279,8 @@ backend image process: gCVimg using OpenCV
 		choosed_path = self.gFileDialog.getOpenFileName(self, u"Open File", openImage_path)
 		if choosed_path[0]:
 			self.showImgFromPath(choosed_path[0])
+			self.printToStatus("Open Image in " + choosed_path[0])
+
 
 	def showImgFromPath(self, img_path):
 		if Debug:
@@ -375,14 +398,9 @@ backend image process: gCVimg using OpenCV
 		if Debug:
 			print("selectImg")
 		if self.gSelectDestination_exist:
-			print(self.gImgList.cur_idx)
-			print(self.gImgList.getImgPath())
-
 			img_src = self.gImgList.getImgPath()
-			# img_des = os.path.join(self.gSelectDestinationFolder, os.path.basename(img_src))
-
 			img_des = self.gSelectDestinationFolder
-			print img_src, img_des
+			# print img_src, img_des
 			shutil.copy(img_src, self.gSelectDestinationFolder)
 		else:
 			print("Did not set Select Destination!")
@@ -447,6 +465,28 @@ backend image process: gCVimg using OpenCV
 				ret_cnt = len(file_names)
 				break
 		return file_names, ret_cnt
+
+	def todoInfo(self):
+		if Debug:
+			print("todoInfo")
+		reply = QMessageBox.about(self.gMesssage, "Todo Info", "This function will be active in future version.")
+
+
+	def onlineHelp(self):
+		if Debug:
+			print("about_Enchain")
+		QDesktopServices.openUrl(QUrl(onlineHelpLink))
+
+	def about_Enchain(self):
+		if Debug:
+			print("about_Enchain")
+		reply = QMessageBox.about(self.gMesssage, "About Enchain", "Please visit project homepage")
+		QDesktopServices.openUrl(QUrl(projectLink))
+
+	def aboutQt(self):
+		if Debug:
+			print("aboutQt")
+		reply = self.gMesssage.aboutQt(self)
 
 	def closeEvent(self, event):
 		if Debug:

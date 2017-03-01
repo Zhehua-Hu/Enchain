@@ -27,24 +27,14 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>620</y>
+      <x>790</x>
+      <y>640</y>
       <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
      <number>24</number>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>760</x>
-      <y>640</y>
-      <width>321</width>
-      <height>27</height>
-     </rect>
     </property>
    </widget>
   </widget>
@@ -54,7 +44,7 @@
      <x>0</x>
      <y>0</y>
      <width>1080</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -67,7 +57,8 @@
     <addaction name="actionOnline_Help"/>
     <addaction name="actionAuthor_Info"/>
     <addaction name="actionCheck_Update"/>
-    <addaction name="actionInfo"/>
+    <addaction name="actionAbout_Enchain"/>
+    <addaction name="actionAbout_Qt"/>
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
@@ -143,7 +134,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAuthor_Info">
    <property name="text">
-    <string>Author Info</string>
+    <string>Connect Author</string>
    </property>
   </action>
   <action name="actionOnline_Help">
@@ -158,7 +149,7 @@
   </action>
   <action name="actionInfo">
    <property name="text">
-    <string>About</string>
+    <string>About Enchain</string>
    </property>
   </action>
   <action name="actionRename">
@@ -244,6 +235,16 @@
   <action name="actionAssignment">
    <property name="text">
     <string>Assignment</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionAbout_Enchain">
+   <property name="text">
+    <string>About Enchain</string>
    </property>
   </action>
  </widget>

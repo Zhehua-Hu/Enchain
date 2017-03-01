@@ -11,7 +11,8 @@ ${PRODIR}/pyinstaller/pyinstaller.py \
                     --hidden-import=numpy \
                     --hidden-import=sys \
                     --hidden-import=os \
-                    -F -D \
+                    --hidden-import=shutil \
+                    -F  \
                     --specpath ${PRODIR}/build/ \
                     -p ${PRODIR}/ui \
                     -p ${PRODIR}/libs \

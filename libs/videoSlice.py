@@ -46,7 +46,7 @@ def videoSlice(video_path, save_path, save_type="png", img_comp=0):
 	        int(vhandle.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
 	prefix = os.path.basename(save_path)
-	idx = 0
+	idx = 1 # start from 000001.xxx
 
 	if save_type.upper() == "JPEG" or save_type.upper() == "JPG":
 		img_type = int(cv2.IMWRITE_JPEG_OPTIMIZE)
@@ -62,7 +62,7 @@ def videoSlice(video_path, save_path, save_type="png", img_comp=0):
 	while True:
 		ret, frame = vhandle.read()
 		if ret:
-			img_name = save_path + "/" + prefix + "_" + str(idx) + suffix
+			img_name = save_path + "/" + ("%06d" % idx) + suffix
 			# print img_name
 			# print params
 			cv2.imwrite(img_name, frame, params)

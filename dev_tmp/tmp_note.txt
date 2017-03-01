@@ -1,3 +1,6 @@
+UBUNTU
+在菜单Edit->Run configurations 中，手动设置Environment variables，
+
 pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
 
 ./buildtools/pyinstaller/pyinstaller.py -F --specpath ./build/ ./Enchain.py
@@ -5,7 +8,7 @@ pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
 
 
 
-
+windows
 pyinstaller.exe -F -w -c -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py
 #or
 pyinstaller.exe -F -w -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py
