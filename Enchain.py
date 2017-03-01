@@ -11,14 +11,14 @@ Version: v1.0.0
 """
 # read labelImg use drawing!
 # img check: check in/out
-    read_folder
-        img & xml
-        draw rect on img
-        show img
-    ok->done
-    wrong->error-select
-        ->(TODO)redraw
-        rewrite xml
+	read_folder
+		img & xml
+		draw rect on img
+		show img
+	ok->done
+	wrong->error-select
+		->(TODO)redraw
+		rewrite xml
 
 set img jpg format
 # img_delete will reorder img
@@ -60,8 +60,8 @@ if "Windows" in platform.system():
 else:
 	PRO_DIR = os.path.dirname(__file__)
 
-# PRO_DIR = os.environ.get("ENCHAINPATH")
 print PRO_DIR
+__appname__ = "Enchain"
 Debug = True
 gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
 
@@ -91,7 +91,7 @@ from libs.create_VOC_dirs import create_VOC_dirs
 class ImgList():
 	"""
 	class: provide image list management
-    """
+	"""
 
 	cur_idx = 0
 	img_cnt = 0
@@ -164,7 +164,7 @@ backend image process: gCVimg using OpenCV
 		QMainWindow.__init__(self, parent)
 		self.setupUi(self)
 
-		self.setWindowIcon(QIcon(icon_path + "/EnchainLogoLittle.png"))
+
 		self.gFileDialog = QFileDialog()
 		self.gMesssage = QMessageBox()
 		self.graphicsscene = QGraphicsScene()
@@ -487,6 +487,7 @@ backend image process: gCVimg using OpenCV
 		reply = QMessageBox.about(self.gMesssage, "Todo Info", "This function will be active in future version.")
 
 
+	# Common component
 	def onlineHelp(self):
 		if Debug:
 			print("about_Enchain")
@@ -518,10 +519,28 @@ backend image process: gCVimg using OpenCV
 
 
 
+def run_main(argv=[]):
+	"""
+Standard boilerplate Qt/PyQt application code.
+We can test the application in one thread.
+This function can be called by as below:
+app, mwin = run_main(argv)
+"""
+	app = QApplication(argv)
+	app.setApplicationName(__appname__)
+	app.setWindowIcon(QIcon(icon_path + "/EnchainLogoLittle.png"))
 
+	mwin = MainWindow(argv[1] if len(argv) == 2 else None)
+	mwin.show()
+	return app, mwin
 
-if __name__ == "__main__":
-	app = QApplication(sys.argv)
-	w = MainWindow()
-	w.show()
-	sys.exit(app.exec_())
+def main(argv):
+	"""
+Call run_main to start app
+unittest in folder "utest"
+"""
+	app, mwin = run_main(argv)
+	return app.exec_()
+
+if __name__ == '__main__':
+	sys.exit(main(sys.argv))
