@@ -5,7 +5,10 @@
 import os
 
 def make_perfect_path(path):
-	if type(path) != str:
+	# print(path)
+	# print(type(path))
+	# print(type(path))
+	if type(path) != str and type(path) != unicode:
 		print('"%s" is not valid path!' % path)
 		return
 	if path[-1] == '/':

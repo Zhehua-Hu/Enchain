@@ -70,8 +70,8 @@
     <property name="title">
      <string>Project</string>
     </property>
-    <addaction name="actionCreate"/>
     <addaction name="actionSetUserInfo"/>
+    <addaction name="actionCreateVOCFolder"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -245,6 +245,11 @@
   <action name="actionAbout_Enchain">
    <property name="text">
     <string>About Enchain</string>
+   </property>
+  </action>
+  <action name="actionCreateVOCFolder">
+   <property name="text">
+    <string>CreateVOCFolder</string>
    </property>
   </action>
  </widget>

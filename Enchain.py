@@ -8,14 +8,7 @@ Version: v1.0.0
 # open img folder&exit will cause error
 # video_show format bug
 
-
-# cross-platform run
-	## windows[ok]
-	## Ubuntu[skip]
-
-
 """
-# TODO[FUNC]:
 # read labelImg use drawing!
 # img check: check in/out
     read_folder
@@ -28,17 +21,23 @@ Version: v1.0.0
         rewrite xml
 
 # img_delete will reorder img
-# git tag & version1
 
-# Normalize
+# 标准化
 #add icon,tip,shortcut
 #show status
+# unicode
 
+# 可用第一版
+git tag & version1
+cross-platform run
+	## windows[ok]
+	## Ubuntu[skip]
 
-
-# auto-check img adding to folder
+# TODO
 # dataset manage & stat
 
+可有可无
+# auto-check img adding to folder
 # video_select( video player)
 """
 
@@ -84,6 +83,7 @@ icon_path = os.path.join(PRO_DIR, "icons")
 
 from ui.mainwindow import Ui_MainWindow
 from libs.videoSlice import videoSlice, showVideoInfo
+from libs.create_VOC_dirs import create_VOC_dirs
 
 class ImgList():
 	"""
@@ -190,6 +190,7 @@ backend image process: gCVimg using OpenCV
 	def setupMenubar(self):
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
 
+		self.actionCreateVOCFolder.triggered.connect(self.createVOCFolder)
 
 		self.actionQuit.setIcon(QIcon(icon_path + u"/exit-to-app.svg"))
 		self.actionQuit.setShortcut(u"Ctrl+Q")
@@ -269,7 +270,6 @@ backend image process: gCVimg using OpenCV
 	def printToStatus(self, message):
 		self.statusBar().showMessage(message)
 
-
 	def openImage(self):
 		if Debug:
 			openImage_path = os.path.join(PRO_DIR, u"test/img_folder")
@@ -280,7 +280,6 @@ backend image process: gCVimg using OpenCV
 		if choosed_path[0]:
 			self.showImgFromPath(choosed_path[0])
 			self.printToStatus("Open Image in " + choosed_path[0])
-
 
 	def showImgFromPath(self, img_path):
 		if Debug:
@@ -352,7 +351,6 @@ backend image process: gCVimg using OpenCV
 		if self.gImgList_exist:
 			self.showImgFromPath(self.gImgList.previousImg())
 
-
 	def setVideo(self):
 		if Debug:
 			print("setVideo")
@@ -379,7 +377,6 @@ backend image process: gCVimg using OpenCV
 			self.gVidDesFolder = choosed_folder
 
 		videoSlice(self.gVideo, self.gVidDesFolder, "png")
-
 
 	def setSelectDestinationFolder(self):
 		if Debug:
@@ -465,6 +462,19 @@ backend image process: gCVimg using OpenCV
 				ret_cnt = len(file_names)
 				break
 		return file_names, ret_cnt
+
+	# Project Zone
+	def createVOCFolder(self):
+		if Debug:
+			print("createVOCFolder")
+			videoSlice_path = os.path.join(PRO_DIR, u"test/")
+		else:
+			videoSlice_path = os.path.expanduser(u"~")
+
+		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", videoSlice_path)
+		if choosed_folder is not None:
+			create_VOC_dirs(choosed_folder)
+			self.printToStatus("create VOC Folder in " + choosed_folder)
 
 	def todoInfo(self):
 		if Debug:
