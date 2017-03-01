@@ -9,6 +9,8 @@ pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
 
 
 windows
+cd C:\Python27\Scripts
+
 pyinstaller.exe -F -w -c -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py
 #or
 pyinstaller.exe -F -w -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoLittle.ico -p H:\Clouds\pythonPro\A_Github\Enchain\ui -p H:\Clouds\pythonPro\A_Github\Enchain\libs H:\Clouds\pythonPro\A_Github\Enchain\Enchain.py

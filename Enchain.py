@@ -20,6 +20,7 @@ Version: v1.0.0
         ->(TODO)redraw
         rewrite xml
 
+set img jpg format
 # img_delete will reorder img
 
 # 标准化
@@ -29,9 +30,11 @@ Version: v1.0.0
 
 # 可用第一版
 git tag & version1
+体积管理
 cross-platform run
 	## windows[ok]
 	## Ubuntu[skip]
+下载测试
 
 # TODO
 # dataset manage & stat
@@ -50,12 +53,14 @@ import numpy as np
 """
 Global Macros
 """
-# import platform
-# if "Windows" in platform.system():
-# 	PRO_DIR = os.environ.get("ENCHAINPATH")
-# else:
-# 	PRO_DIR = os.environ.get("ENCHAINPATH")
-PRO_DIR = os.environ.get("ENCHAINPATH")
+
+import platform
+if "Windows" in platform.system():
+	PRO_DIR = os.environ.get("ENCHAINPATH")
+else:
+	PRO_DIR = os.path.dirname(__file__)
+
+# PRO_DIR = os.environ.get("ENCHAINPATH")
 print PRO_DIR
 Debug = True
 gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
@@ -71,14 +76,12 @@ from PyQt5.QtWidgets import QApplication, qApp,\
 	QMainWindow, QWidget, QFileDialog, QGraphicsScene,\
 	QGraphicsPixmapItem, QMessageBox, QAction
 
-
 from PyQt5.QtGui import QPixmap, QImage, QIcon, QDesktopServices
 from PyQt5.QtCore import Qt, QUrl
-# from PyQt5.QtWebKit import QWebView
+
 
 
 file_path = os.path.join(PRO_DIR, "ui")
-# sys.path.append(file_path)
 icon_path = os.path.join(PRO_DIR, "icons")
 
 from ui.mainwindow import Ui_MainWindow
@@ -161,7 +164,7 @@ backend image process: gCVimg using OpenCV
 		QMainWindow.__init__(self, parent)
 		self.setupUi(self)
 
-		self.setWindowIcon(QIcon(icon_path + u"/EnchainLogoLittle.png"))
+		self.setWindowIcon(QIcon(icon_path + "/EnchainLogoLittle.png"))
 		self.gFileDialog = QFileDialog()
 		self.gMesssage = QMessageBox()
 		self.graphicsscene = QGraphicsScene()
@@ -192,44 +195,46 @@ backend image process: gCVimg using OpenCV
 
 		self.actionCreateVOCFolder.triggered.connect(self.createVOCFolder)
 
-		self.actionQuit.setIcon(QIcon(icon_path + u"/exit-to-app.svg"))
-		self.actionQuit.setShortcut(u"Ctrl+Q")
+		self.actionQuit.setIcon(QIcon(icon_path + "/exit-to-app.svg"))
+		self.actionQuit.setShortcut("Ctrl+Q")
 		self.actionQuit.setStatusTip(u"Quit Software")
 		self.actionQuit.triggered.connect(qApp.quit)
 
-		self.actionClose.setIcon(QIcon(icon_path + u"/close-circle.svg"))
+		self.actionClose.setIcon(QIcon(icon_path + "/close-circle.svg"))
 		self.actionClose.setStatusTip(u"Close File")
 		self.actionClose.triggered.connect(self.clearView)
 
-		self.actionOpenImage.setIcon(QIcon(icon_path + u"/image-area.svg"))
+		self.actionOpenImage.setIcon(QIcon(icon_path + "/image-area.svg"))
 		self.actionOpenImage.setStatusTip(u"Open Single Image")
 		self.actionOpenImage.triggered.connect(self.openImage)
 
 		self.actionSaveImage.setStatusTip(u"Save Image")
 		self.actionSaveImage.triggered.connect(self.saveImageFromBackendCVimg)
 
-		self.actionOpenFolder.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionOpenFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionOpenFolder.setStatusTip(u"Open Folder Contains Images")
 		self.actionOpenFolder.triggered.connect(self.setSelectSourceFolder)
 
-		self.actionOpenVideo.setIcon(QIcon(icon_path + u"/video.svg"))
+		self.actionOpenVideo.setIcon(QIcon(icon_path + "/video.svg"))
 		self.actionOpenVideo.setStatusTip(u"Open Folder Contains Images")
 		self.actionOpenVideo.triggered.connect(self.setVideo)
 
-		self.actionVideoSlice.setIcon(QIcon(icon_path + u"/animation.svg"))
+		self.actionVideoSlice.setIcon(QIcon(icon_path + "/animation.svg"))
 		self.actionVideoSlice.setStatusTip(u"Slice Video TO Images")
 		self.actionVideoSlice.triggered.connect(self.videoSliceToFolder)
 
-		self.actionSelectSource.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionSelectSource.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionSelectSource.setStatusTip(u"Open Folder Contains Source Images")
 		self.actionSelectSource.triggered.connect(self.setSelectSourceFolder)
 
-		self.actionSelectDestination.setIcon(QIcon(icon_path + u"/folder-open.svg"))
+		self.actionSelectDestination.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionSelectDestination.setStatusTip(u"Open Folder To Save Selected Images")
 		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
 
 		self.actionDataCleansing.triggered.connect(self.todoInfo)
+
+
 
 		self.actionOnline_Help.triggered.connect(self.onlineHelp)
 		self.actionAbout_Enchain.triggered.connect(self.about_Enchain)
