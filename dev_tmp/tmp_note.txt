@@ -18,3 +18,22 @@ pyinstaller.exe -F -w -i H:\Clouds\pythonPro\A_Github\Enchain\icons\EnchainLogoL
 
 cd C:\Python27\Lib\site-packages\PyQt5\uic
 pyuic.py H:\Clouds\pythonPro\A_Github\Enchainui\mainwindow.ui -o H:\Clouds\pythonPro\A_Github\Enchainui\ui\mainwindow.py
+
+
+
+* Step1: 下载支持库
+    - 登录github, [链接](https://github.com/Zhehua-Hu/Enchain),
+    - 选择"Clone or download"-> "Download ZIP"下载, 下载过程中可在页面右上角给一颗star
+    - 将下载文件放在英文目录下解压
+
+* Step2: windows 系统添加环境变量
+   - 在控制面板搜索 ”环境变量”
+   - 选择 “编辑系统环境变量”
+   - "高级" -> "环境变量 -> "系统变量"
+   - "新建"->
+       - 变量名：ENCHAINPATH
+       - 变量值：支持库的路径(路径尾包含/Enchain)
+
+* Step3:
+
+pyinstaller.exe -F -w -c -p H:\Clouds\pythonPro\labelImg\libs H:\Clouds\pythonPro\labelImg\labelImg.py

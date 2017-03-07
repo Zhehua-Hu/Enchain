@@ -1,0 +1,23 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+
+<file alias="account-circle.svg">icons/account-circle.svg</file>
+<file alias="arrow-left-bold-circle.svg">icons/arrow-left-bold-circle.svg</file>
+<file alias="check-circle.svg">icons/check-circle.svg</file>
+<file alias="delete-circle.svg">icons/delete-circle.svg</file>
+<file alias="folder-open.svg">icons/folder-open.svg</file>
+<file alias="star-circle.svg">icons/star-circle.svg</file>
+<file alias="arrow-right-bold-circle.svg">icons/arrow-right-bold-circle.svg</file>
+<file alias="animation.svg">icons/animation.svg</file>
+<file alias="video.svg">icons/video.svg</file>
+<file alias="close-circle.svg">icons/close-circle.svg</file>
+<file alias="exit-to-app.svg">icons/exit-to-app.svg</file>
+<file alias="image-area.svg">icons/image-area.svg</file>
+
+<file alias="EnchainLogoLittle.png">icons/EnchainLogoLittle.png</file>
+<file alias="EnchainLogoLittle.ico">icons/EnchainLogoLittle.ico</file>
+
+
+</qresource>
+</RCC>

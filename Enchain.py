@@ -5,44 +5,8 @@ Version: v1.0.0
 """
 
 # TODO[BUG]:
-# open img folder&exit will cause error
 # video_show format bug
 
-"""
-# read labelImg use drawing!
-# img check: check in/out
-	read_folder
-		img & xml
-		draw rect on img
-		show img
-	ok->done
-	wrong->error-select
-		->(TODO)redraw
-		rewrite xml
-
-set img jpg format
-# img_delete will reorder img
-
-# 标准化
-#add icon,tip,shortcut
-#show status
-# unicode
-
-# 可用第一版
-git tag & version1
-体积管理
-cross-platform run
-	## windows[ok]
-	## Ubuntu[skip]
-下载测试
-
-# TODO
-# dataset manage & stat
-
-可有可无
-# auto-check img adding to folder
-# video_select( video player)
-"""
 
 # std libs
 import sys
@@ -51,8 +15,10 @@ import shutil
 import numpy as np
 
 """
-Global Macros
+Global Config
 """
+Debug = True
+USE_QRC = True
 
 import platform
 if "Windows" in platform.system():
@@ -61,10 +27,16 @@ else:
 	PRO_DIR = os.path.dirname(__file__)
 
 print PRO_DIR
-__appname__ = "Enchain"
-Debug = True
-gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
+file_path = os.path.join(PRO_DIR, "ui")
+icon_path = os.path.join(PRO_DIR, "icons")
 
+
+if USE_QRC:
+	icon_path = ":/"
+
+
+gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
+__appname__ = "Enchain"
 projectLink = "https://github.com/Zhehua-Hu/Enchain"
 onlineHelpLink = "https://github.com/Zhehua-Hu/Enchain/wiki"
 author_blog = "http://zhehua.info"
@@ -72,21 +44,17 @@ author_blog = "http://zhehua.info"
 # OpenCV
 import cv2
 # PyQt
-from PyQt5.QtWidgets import QApplication, qApp,\
-	QMainWindow, QWidget, QFileDialog, QGraphicsScene,\
-	QGraphicsPixmapItem, QMessageBox, QAction
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
-from PyQt5.QtGui import QPixmap, QImage, QIcon, QDesktopServices
-from PyQt5.QtCore import Qt, QUrl
+import resources
 
-
-
-file_path = os.path.join(PRO_DIR, "ui")
-icon_path = os.path.join(PRO_DIR, "icons")
 
 from ui.mainwindow import Ui_MainWindow
 from libs.videoSlice import videoSlice, showVideoInfo
 from libs.create_VOC_dirs import create_VOC_dirs
+from libs.img_cvt_pyqt_cv import *
 
 class ImgList():
 	"""
@@ -101,6 +69,12 @@ class ImgList():
 		self.imgs_path, self.img_cnt = self.getContainedImgs(folder, type="Recursive")
 
 	def getContainedImgs(self, folder, type="NotRecursive"):
+		"""
+		get Contained Imgs
+		:param folder: searched folder
+		:param type: determine if search sub-folder
+		:return: full path list, list length
+		"""
 		imgs_name = []
 		imgs_path = []
 		ret_cnt = 0
@@ -154,10 +128,11 @@ class ImgList():
 			print("%s : %s" % item)
 
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
 Main Window in Enchain.
-backend image process: gCVimg using OpenCV
+backend image process: gCVmat using OpenCV
 """
 	def __init__(self, parent=None):
 		super(QMainWindow, self).__init__()
@@ -170,7 +145,8 @@ backend image process: gCVimg using OpenCV
 		self.graphicsscene = QGraphicsScene()
 		self.graphicsView.setScene(self.graphicsscene)
 
-		self.gCVimg = None
+		# global variables
+		self.gCVmat = None
 		self.gQpixmap = None
 		self.gQimg = None
 		self.gVideo = None
@@ -184,11 +160,52 @@ backend image process: gCVimg using OpenCV
 		self.gSelectDestination_exist = False
 
 
+		# self.gProgressBarCnt =
+		# 百分比，大小限控制
+		self.progressBar.step =100
+		self.progressBar.setValue(self.progressBar.step)
+
+		self.dockWidgetRight.setObjectName("listView")
+
 
 		self.setupMenubar()
 		self.setupToolbar()
 		self.setupButtons()
 		self.setupStatusbar()
+
+
+	def wheelEvent(self, ev):
+		# print(ev.phase())
+		# print(ev.x())
+		# print(ev.y())
+		# print(ev.pos())
+		# print(ev.posF())
+		# print(ev.globalX())
+		# print(ev.globalY())
+		# print(ev.angleDelta())
+		# print(ev.pixelDelta())
+		# print(ev.buttons())
+
+		# for item in type(ev).__dict__:
+		# 	print(item)
+			# print(getattr(ev,item))
+
+		def isWheelUp(ev):
+			if ev.angleDelta().y() >=0:
+				return True
+			else:
+				return False
+		print(isWheelUp(ev))
+		# print(ev.angleDelta().y())
+
+
+		ev.accept()
+
+	def keyPressEvent(self, ev):
+		# print(ev)
+		key = ev.key()
+		print(key)
+
 
 	def setupMenubar(self):
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
@@ -209,7 +226,7 @@ backend image process: gCVimg using OpenCV
 		self.actionOpenImage.triggered.connect(self.openImage)
 
 		self.actionSaveImage.setStatusTip(u"Save Image")
-		self.actionSaveImage.triggered.connect(self.saveImageFromBackendCVimg)
+		self.actionSaveImage.triggered.connect(self.saveImageFromBackendCVmat)
 
 		self.actionOpenFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionOpenFolder.setStatusTip(u"Open Folder Contains Images")
@@ -239,6 +256,29 @@ backend image process: gCVimg using OpenCV
 		self.actionOnline_Help.triggered.connect(self.onlineHelp)
 		self.actionAbout_Enchain.triggered.connect(self.about_Enchain)
 		self.actionAbout_Qt.triggered.connect(self.aboutQt)
+
+
+	def enterEvent(self, ev):
+		print("enterEvent")
+
+	def leaveEvent(self, ev):
+		print("leaveEvent")
+
+	def focusOutEvent(self, ev):
+		print("focusOutEvent")
+
+	def mouseMoveEvent(self, ev):
+		print("mouseMoveEvent")
+		print(ev.pos())
+
+	def mousePressEvent(self, ev):
+		print("mousePressEvent")
+		print(ev.pos())
+
+	def mouseReleaseEvent(self, ev):
+		print("mouseReleaseEvent")
+		print(ev.pos())
+
 
 
 
@@ -290,14 +330,15 @@ backend image process: gCVimg using OpenCV
 		if Debug:
 			print("showImgFromPath")
 			print(img_path)
-
 		pixmap = QPixmap(img_path)
 		self.updateView(pixmap)
 
-	def showImgFromCvimg(self, CVimg):
+
+
+	def showImgFromCVmat(self, CVmat):
 		if Debug:
-			print("showImgFromCvimg")
-		self.updateView(self.convert_CVimgToQpixmap(CVimg))
+			print("showImgFromCVmat")
+		self.updateView(convert_CVmatToQpixmap(CVmat))
 
 	def getPixmapFromPath(self, img_path):
 		if Debug:
@@ -309,6 +350,8 @@ backend image process: gCVimg using OpenCV
 		self.clearView()
 		viewWidth = self.graphicsView.frameGeometry().width()
 		viewHeight = self.graphicsView.frameGeometry().height()
+
+		# fix window
 		pixRatioMap = qpixmap.scaled(viewWidth, viewHeight, Qt.KeepAspectRatio)
 		pixItem = QGraphicsPixmapItem(pixRatioMap)
 		self.graphicsscene.addItem(pixItem)
@@ -330,11 +373,8 @@ backend image process: gCVimg using OpenCV
 			print("Select Source Has Set!")
 			
 		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
-		
-		if Debug:
-			print(choosed_folder)
-			print(choosed_folder[0])
-			
+		if choosed_folder == u'' or choosed_folder == '':
+			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder is not None:
 			self.gSelectSourceFolder = choosed_folder
 
@@ -365,10 +405,12 @@ backend image process: gCVimg using OpenCV
 
 		choosed_path = self.gFileDialog.getOpenFileName(self, u"Open File", openVideo_path)
 
+		if choosed_path[0] == u'' or choosed_path[0] == '':
+			return # avoid bug: open filedialog but not choose anything
 		if choosed_path[0] is not None:
 			self.gVideo = choosed_path[0]
 			vhandle, fps, size, firstframe = showVideoInfo(choosed_path[0])
-			self.showImgFromCvimg(firstframe)
+			self.showImgFromCVmat(firstframe)
 
 	def videoSliceToFolder(self):
 		if Debug:
@@ -378,6 +420,8 @@ backend image process: gCVimg using OpenCV
 			videoSlice_path = os.path.expanduser(u"~")
 
 		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", videoSlice_path)
+		if choosed_folder == u'' or choosed_folder == '':
+			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder is not None:
 			self.gVidDesFolder = choosed_folder
 
@@ -391,6 +435,8 @@ backend image process: gCVimg using OpenCV
 			tmp_path = os.path.expanduser(u"~")
 
 		choosed_folder = self.gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
+		if choosed_folder == u'' or choosed_folder == '':
+			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder[0] is not None:
 			self.gSelectDestinationFolder = choosed_folder
 			self.gSelectDestination_exist = True
@@ -415,37 +461,31 @@ backend image process: gCVimg using OpenCV
 		else:
 			print("Did not set Select Destination!")
 
-	def convert_CVimgToQpixmap(self, CVimg):
-		height, width, dim = CVimg.shape
-		bytesPerLine = dim * width
-		qimg = QImage(CVimg.data, width, height, bytesPerLine, QImage.Format_RGB888)
-		return QPixmap.fromImage(qimg)
 
-	def convert_CVimgToQimg(self, CVimg):
-		height, width, dim = CVimg.shape
-		bytesPerLine = dim * width
-		qimg = QImage(CVimg.data, width, height, bytesPerLine, QImage.Format_RGB888)
-		return qimg
 
-	def saveImageFromBackendCVimg(self):
+
+
+	def saveImageFromBackendCVmat(self):
 		default_name = "test.jpg"
 		try:
-			if self.gCVimg is not None:
+			if self.gCVmat is not None:
 				choosed_path = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
-				if choosed_path[0]:
-					cv2.imwrite(choosed_path[0], self.gCVimg)
+				if choosed_path[0] == u'' or choosed_path[0] == '':
+					return # avoid bug: open filedialog but not choose anything
+				if choosed_path[0] is not None:
+					cv2.imwrite(choosed_path[0], self.gCVmat)
 			else:
 				print("Empty!")
 		except:
 			print("No Image!")
 
-	def saveImageFromCVimg(self, CVimg):
+	def saveImageFromCVmat(self, CVmat):
 		default_name = "test.jpg"
 		try:
-			if self.gCVimg is not None:
+			if self.gCVmat is not None:
 				choosed_path = self.gFileDialog.getSaveFileName(self, "Save file", os.path.expanduser("~") + "/" + default_name)
 				if choosed_path[0]:
-					cv2.imwrite(choosed_path[0], CVimg)
+					cv2.imwrite(choosed_path[0], CVmat)
 			else:
 				print("Empty!")
 		except:
@@ -540,7 +580,7 @@ Call run_main to start app
 unittest in folder "utest"
 """
 	app, mwin = run_main(argv)
-	return app.exec_()
+	return app.exec_() # enter Event-Loop
 
 if __name__ == '__main__':
 	sys.exit(main(sys.argv))
