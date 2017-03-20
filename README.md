@@ -1,11 +1,11 @@
-#[![](./icons/EnchainLogoLittle.png)](https://github.com/Zhehua-Hu/Enchain)Enchain(under construction)
+# [![](./icons/EnchainLogoLittle.png)](https://github.com/Zhehua-Hu/Enchain)Enchain(under construction)
 
 Enchain is a versatile imag**E** labelli**N**g tool**CHAIN** for deep learning.
 
 It is also a guidance/pipeline to prepare your own dataset.
 
 
-[中文维基](https://github.com/Zhehua-Hu/Enchain/wiki/README_Chineses)
+# [中文维基](https://github.com/Zhehua-Hu/Enchain/wiki/README_Chineses)
 
 ## Dataset Generation Procedure
 
