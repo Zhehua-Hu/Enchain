@@ -72,9 +72,16 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuRename">
+     <property name="title">
+      <string>Rename</string>
+     </property>
+     <addaction name="actionFolderContained"/>
+    </widget>
     <addaction name="actionCreateVOCFolder"/>
     <addaction name="actionCutImage"/>
     <addaction name="actionConvertSliceToVideo"/>
+    <addaction name="menuRename"/>
    </widget>
    <widget class="QMenu" name="menuManagement">
     <property name="title">
@@ -274,6 +281,11 @@
   <action name="actionConvertSliceToVideo">
    <property name="text">
     <string>ConvertSliceToVideo</string>
+   </property>
+  </action>
+  <action name="actionFolderContained">
+   <property name="text">
+    <string>FolderContained</string>
    </property>
   </action>
  </widget>

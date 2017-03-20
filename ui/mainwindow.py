@@ -18,11 +18,11 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
-        self.graphicsView.setMouseTracking(True)
-        self.graphicsView.setFocusPolicy(QtCore.Qt.WheelFocus)
-        self.graphicsView.setObjectName("graphicsView")
-        self.verticalLayout_2.addWidget(self.graphicsView)
+        self._graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
+        self._graphicsView.setMouseTracking(True)
+        self._graphicsView.setFocusPolicy(QtCore.Qt.WheelFocus)
+        self._graphicsView.setObjectName("graphicsView")
+        self.verticalLayout_2.addWidget(self._graphicsView)
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.progressBar.setProperty("value", 24)
         self.progressBar.setObjectName("progressBar")
@@ -161,7 +161,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.treeWidget, self.listView)
-        MainWindow.setTabOrder(self.listView, self.graphicsView)
+        MainWindow.setTabOrder(self.listView, self._graphicsView)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
