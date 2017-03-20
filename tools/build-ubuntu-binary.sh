@@ -1,9 +1,13 @@
 #!/bin/bash
+# need  pywin32
 
-PRODIR=`pwd`
 PRONAME=Enchain
+PRODIR=/home/zhehua/Github/Enchain
 
+cur_path=`pwd`
+cd ${PRODIR}
 rm -rf ${PRODIR}/build/
+mkdir -p ${PRODIR}/dist
 rm -rf ${PRODIR}/dist/
 rm -rf ${PRODIR}/build/${PRONAME}.spec
 
@@ -21,4 +25,6 @@ ${PRODIR}/pyinstaller/pyinstaller.py \
 
 
 rm -rf ${PRODIR}/build/
-mv ${PRODIR}/dist/${PRONAME} ~/${PRONAME}
+cp -f ${PRODIR}/dist/${PRONAME} ~/
+rm -f ${PRODIR}/dist/${PRONAME}
+cd ${cur_path}

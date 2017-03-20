@@ -36,11 +36,17 @@ It is also a guidance/pipeline to prepare your own dataset.
 
 # Join us!
 
+## Unsolved Bugs
+
+* Can not open video with Chinese path in windows  
+solvered in ubuntu, see "videoSlice.py": `vhandle = cv2.VideoCapture(video_path.encode('utf-8'))`
+
+
 ## Acknowladgement
 
-Icons:https://github.com/Templarian/MaterialDesign
+Icons: <https://github.com/Templarian/MaterialDesign>
 
-##License
+## License
 
 ## Related
 

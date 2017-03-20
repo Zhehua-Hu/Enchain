@@ -6,13 +6,16 @@
 import sys
 
 def u(x):
-    '''py2/py3 unicode helper'''
+    """
+
+    :param x: py2/py3 string
+    :return: unicode
+    """
     if sys.version_info < (3, 0, 0):
         if type(x) == str:
             return x.decode('utf-8')
-        if type(x) == QString:
-            return unicode(x)
-        return x
+        else:
+			return unicode(x)
     else:
         return x  # py3
 

@@ -1,11 +1,9 @@
+#!/usr/bin/env python
 # coding=utf-8
 """
- Copyright {2017} {Zhehua-Hu}
-Version: v1.0.0
+Copyright {2017} {Zhehua-Hu}
+Version: v0.0.2
 """
-
-# TODO[BUG]:
-# video_show format bug
 
 
 # std libs
@@ -19,6 +17,8 @@ Global Config
 """
 Debug = True
 USE_QRC = True
+ProgressBarFull = 100
+ProgressBarEmpty = 0
 
 import platform
 if "Windows" in platform.system():
@@ -165,15 +165,16 @@ backend image process: gCVmat using OpenCV
 		self.progressBar.step =100
 		self.progressBar.setValue(self.progressBar.step)
 
-		self.dockWidgetRight.setObjectName("listView")
 
+
+		self.dockWidgetRight.setObjectName("listView")
 
 		self.setupMenubar()
 		self.setupToolbar()
 		self.setupButtons()
 		self.setupStatusbar()
 
-
+# Event Testing
 	def wheelEvent(self, ev):
 		# print(ev.phase())
 		# print(ev.x())
@@ -207,6 +208,32 @@ backend image process: gCVmat using OpenCV
 		print(key)
 
 
+	def enterEvent(self, ev):
+		print("enterEvent")
+
+	def leaveEvent(self, ev):
+		print("leaveEvent")
+
+	def focusOutEvent(self, ev):
+		print("focusOutEvent")
+
+	def mouseMoveEvent(self, ev):
+		print("mouseMoveEvent")
+		print(ev.pos())
+
+	def mousePressEvent(self, ev):
+		print("mousePressEvent")
+		print(ev.pos())
+
+	def mouseReleaseEvent(self, ev):
+		print("mouseReleaseEvent")
+		print(ev.pos())
+
+
+
+
+# Sys Setup
+
 	def setupMenubar(self):
 		self.menubar.setNativeMenuBar(False)  # better for cross-platform
 
@@ -233,7 +260,7 @@ backend image process: gCVmat using OpenCV
 		self.actionOpenImageFolder.triggered.connect(self.setSelectSourceFolder)
 
 		self.actionOpenVideo.setIcon(QIcon(icon_path + "/video.svg"))
-		self.actionOpenVideo.setStatusTip(u"Open Folder Contains Images")
+		self.actionOpenVideo.setStatusTip(u"Open Folder Contains Video")
 		self.actionOpenVideo.triggered.connect(self.setVideo)
 
 		self.actionOpenVideoFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
@@ -241,8 +268,13 @@ backend image process: gCVmat using OpenCV
 		self.actionOpenVideoFolder.triggered.connect(self.todoInfo)
 
 		self.actionSaveSliceTo.setIcon(QIcon(icon_path + "/animation.svg"))
-		self.actionSaveSliceTo.setStatusTip(u"Slice Video TO Images")
-		self.actionSaveSliceTo.triggered.connect(self.videoSliceToFolder)
+		self.actionSaveSliceTo.setStatusTip(u"Slice Video To Images")
+		self.actionSaveSliceTo.triggered.connect(self.SaveSliceToFolder)
+
+		self.actionSaveSliceSetTo.setIcon(QIcon(icon_path + "/animation.svg"))
+		self.actionSaveSliceSetTo.setStatusTip(u"Slice Videos To Images")
+		self.actionSaveSliceSetTo.triggered.connect(self.SaveSliceSetToFolder)
+
 
 		self.actionSelectSource.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionSelectSource.setStatusTip(u"Open Folder Contains Source Images")
@@ -252,38 +284,15 @@ backend image process: gCVmat using OpenCV
 		self.actionSelectDestination.setStatusTip(u"Open Folder To Save Selected Images")
 		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
-
-		self.actionCutImage.triggered.connect(self.todoInfo)
-
-
 		self.actionOnline_Help.triggered.connect(self.onlineHelp)
 		self.actionAbout_Enchain.triggered.connect(self.about_Enchain)
 		self.actionAbout_Qt.triggered.connect(self.aboutQt)
 
-
-	def enterEvent(self, ev):
-		print("enterEvent")
-
-	def leaveEvent(self, ev):
-		print("leaveEvent")
-
-	def focusOutEvent(self, ev):
-		print("focusOutEvent")
-
-	def mouseMoveEvent(self, ev):
-		print("mouseMoveEvent")
-		print(ev.pos())
-
-	def mousePressEvent(self, ev):
-		print("mousePressEvent")
-		print(ev.pos())
-
-	def mouseReleaseEvent(self, ev):
-		print("mouseReleaseEvent")
-		print(ev.pos())
-
-
-
+		# TODO
+		self.actionCutImage.triggered.connect(self.todoInfo)
+		self.actionShow_guidance.triggered.connect(self.todoInfo)
+		self.actionDatasetInput.triggered.connect(self.todoInfo)
+		self.actionConvertSliceToVideo.triggered.connect(self.todoInfo)
 
 
 	def setupToolbar(self):
@@ -319,6 +328,10 @@ backend image process: gCVmat using OpenCV
 		self.statusBar().showMessage(message)
 
 	def openImage(self):
+		"""
+		Open and Show single image
+		:return:
+		"""
 		if Debug:
 			openImage_path = os.path.join(PRO_DIR, u"test/img_folder")
 		else:
@@ -387,7 +400,7 @@ backend image process: gCVmat using OpenCV
 		if self.gImgList_exist:
 			self.showImgFromPath(self.gImgList.FirstImg())
 
-	def showNextImg(self):#
+	def showNextImg(self):
 		if Debug:
 			print("showNextImg")
 		if self.gImgList_exist:
@@ -402,9 +415,9 @@ backend image process: gCVmat using OpenCV
 	def setVideo(self):
 		if Debug:
 			print("setVideo")
-			openVideo_path = os.path.join(PRO_DIR, u"test/video_folder")
+			openVideo_path = os.path.join(PRO_DIR, "test/video_folder")
 		else:
-			openVideo_path = os.path.expanduser(u"~")
+			openVideo_path = os.path.expanduser("~")
 
 		choosed_path = self.gFileDialog.getOpenFileName(self, u"Open File", openVideo_path)
 
@@ -412,10 +425,16 @@ backend image process: gCVmat using OpenCV
 			return # avoid bug: open filedialog but not choose anything
 		if choosed_path[0] is not None:
 			self.gVideo = choosed_path[0]
+			print("path->: ", self.gVideo)
+			print(type(self.gVideo))
 			vhandle, fps, size, firstframe = showVideoInfo(choosed_path[0])
 			self.showImgFromCVmat(firstframe)
 
-	def videoSliceToFolder(self):
+		self.printToStatus("Please Choose Folder To Save Video Slice")
+		self.setProgressBar(ProgressBarEmpty)
+
+
+	def SaveSliceToFolder(self):
 		if Debug:
 			print("videoSlice")
 			videoSlice_path = os.path.join(PRO_DIR, u"test/")
@@ -428,7 +447,11 @@ backend image process: gCVmat using OpenCV
 		if choosed_folder is not None:
 			self.gVidDesFolder = choosed_folder
 
-		videoSlice(self.gVideo, self.gVidDesFolder, "png")
+		videoSlice(self.gVideo, self.gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
+		self.setProgressBar(ProgressBarFull)
+
+	def SaveSliceSetToFolder(self):
+		pass
 
 	def setSelectDestinationFolder(self):
 		if Debug:
@@ -446,6 +469,10 @@ backend image process: gCVmat using OpenCV
 		# TODO: pop info if img folder has opened
 
 	def selectImg(self):
+		"""
+		Choose image and save it to SelectDestinationFolder
+		:return:
+		"""
 		if Debug:
 			print("selectImg")
 		if self.gSelectDestination_exist:
@@ -457,15 +484,16 @@ backend image process: gCVmat using OpenCV
 			print("Did not set Select Destination!")
 
 	def deleteImg(self):
+		"""
+		Delete image from source
+		:return:
+		"""
 		if Debug:
 			print("deleteImg")
 		if self.gSelectDestination_exist:
 			print(self.gImgList.cur_idx)
 		else:
 			print("Did not set Select Destination!")
-
-
-
 
 
 	def saveImageFromBackendCVmat(self):
@@ -511,6 +539,18 @@ backend image process: gCVmat using OpenCV
 				break
 		return file_names, ret_cnt
 
+	# handler
+
+	def setProgressBar(self, num):
+		if num <= 0:
+			self.progressBar.setValue(0)
+		elif num >= 100:
+			self.progressBar.setValue(100)
+		else:
+			self.progressBar.setValue(num)
+
+
+
 	# Project Zone
 	def createVOCFolder(self):
 		if Debug:
@@ -534,7 +574,7 @@ backend image process: gCVmat using OpenCV
 		reply = QMessageBox.about(self.gMesssage, "Todo Info", "This function will be active in future version.")
 
 
-	# Common component
+	# Common Component
 	def onlineHelp(self):
 		if Debug:
 			print("about_Enchain")

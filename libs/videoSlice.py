@@ -6,13 +6,15 @@ import argparse
 import os
 import cv2
 
+
 # TODO:
 # add gray img
 
 
+
 def showVideoInfo(video_path):
 	try:
-		vhandle = cv2.VideoCapture(video_path)
+		vhandle = cv2.VideoCapture(video_path.encode('utf-8'))  # For read Chinease-name video
 		fps = vhandle.get(cv2.CAP_PROP_FPS)
 		count = vhandle.get(cv2.CAP_PROP_FRAME_COUNT)
 		size = (int(vhandle.get(cv2.CAP_PROP_FRAME_WIDTH)),
@@ -29,7 +31,7 @@ def showVideoInfo(video_path):
 	except:
 		"Error in showVideoInfo"
 
-def videoSlice(video_path, save_path, save_type="png", img_comp=0):
+def videoSlice(video_path, save_path, progressbarsetter=None, save_type="png", img_comp=0, start_idx=1):
 	"""
 
 	:param video_path:
@@ -39,14 +41,15 @@ def videoSlice(video_path, save_path, save_type="png", img_comp=0):
 					png[0-9], jpg[0-100]
 	:return:
 	"""
-	vhandle = cv2.VideoCapture(video_path)
+	vhandle = cv2.VideoCapture(video_path.encode('utf-8'))  # For read Chinease-name video
 	fps = vhandle.get(cv2.CAP_PROP_FPS)
 	count = vhandle.get(cv2.CAP_PROP_FRAME_COUNT)
 	size = (int(vhandle.get(cv2.CAP_PROP_FRAME_WIDTH)),
 	        int(vhandle.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
 	prefix = os.path.basename(save_path)
-	idx = 1 # start from 000001.xxx
+	idx = start_idx  # start from 000001.xxx
+	cnt_idx = 1
 
 	if save_type.upper() == "JPEG" or save_type.upper() == "JPG":
 		img_type = int(cv2.IMWRITE_JPEG_OPTIMIZE)
@@ -62,11 +65,15 @@ def videoSlice(video_path, save_path, save_type="png", img_comp=0):
 	while True:
 		ret, frame = vhandle.read()
 		if ret:
+			if progressbarsetter is not None:
+				progressbarsetter(cnt_idx/(count/100.0))
+			print(cnt_idx/(count/100.0))
 			img_name = save_path + "/" + ("%06d" % idx) + suffix
 			# print img_name
 			# print params
 			cv2.imwrite(img_name, frame, params)
 			idx += 1
+			cnt_idx +=1
 		else:
 			break
 	print("Slicing Done!")

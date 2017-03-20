@@ -62,7 +62,7 @@
     <addaction name="actionAbout_Enchain"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
-   <widget class="QMenu" name="menuTool">
+   <widget class="QMenu" name="menuLabelling">
     <property name="title">
      <string>Labelling</string>
     </property>
@@ -74,6 +74,7 @@
     </property>
     <addaction name="actionCreateVOCFolder"/>
     <addaction name="actionCutImage"/>
+    <addaction name="actionConvertSliceToVideo"/>
    </widget>
    <widget class="QMenu" name="menuManagement">
     <property name="title">
@@ -98,9 +99,11 @@
       <string>Video</string>
      </property>
      <addaction name="actionOpenVideo"/>
-     <addaction name="actionOpenVideoFolder"/>
-     <addaction name="separator"/>
      <addaction name="actionSaveSliceTo"/>
+     <addaction name="separator"/>
+     <addaction name="actionOpenVideoFolder"/>
+     <addaction name="actionSaveSliceSetTo"/>
+     <addaction name="separator"/>
     </widget>
     <widget class="QMenu" name="menuDataCleansing">
      <property name="title">
@@ -121,7 +124,7 @@
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuPreprocess"/>
-   <addaction name="menuTool"/>
+   <addaction name="menuLabelling"/>
    <addaction name="menuManagement"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -261,6 +264,16 @@
   <action name="actionOpenVideoFolder">
    <property name="text">
     <string>OpenVideoFolder</string>
+   </property>
+  </action>
+  <action name="actionSaveSliceSetTo">
+   <property name="text">
+    <string>SaveSliceSetTo</string>
+   </property>
+  </action>
+  <action name="actionConvertSliceToVideo">
+   <property name="text">
+    <string>ConvertSliceToVideo</string>
    </property>
   </action>
  </widget>
