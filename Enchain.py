@@ -228,17 +228,21 @@ backend image process: gCVmat using OpenCV
 		self.actionSaveImage.setStatusTip(u"Save Image")
 		self.actionSaveImage.triggered.connect(self.saveImageFromBackendCVmat)
 
-		self.actionOpenFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
-		self.actionOpenFolder.setStatusTip(u"Open Folder Contains Images")
-		self.actionOpenFolder.triggered.connect(self.setSelectSourceFolder)
+		self.actionOpenImageFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
+		self.actionOpenImageFolder.setStatusTip(u"Open Folder Contains Images")
+		self.actionOpenImageFolder.triggered.connect(self.setSelectSourceFolder)
 
 		self.actionOpenVideo.setIcon(QIcon(icon_path + "/video.svg"))
 		self.actionOpenVideo.setStatusTip(u"Open Folder Contains Images")
 		self.actionOpenVideo.triggered.connect(self.setVideo)
 
-		self.actionVideoSlice.setIcon(QIcon(icon_path + "/animation.svg"))
-		self.actionVideoSlice.setStatusTip(u"Slice Video TO Images")
-		self.actionVideoSlice.triggered.connect(self.videoSliceToFolder)
+		self.actionOpenVideoFolder.setIcon(QIcon(icon_path + "/folder-open.svg"))
+		self.actionOpenVideoFolder.setStatusTip(u"Open Folder Contains Videos")
+		self.actionOpenVideoFolder.triggered.connect(self.todoInfo)
+
+		self.actionSaveSliceTo.setIcon(QIcon(icon_path + "/animation.svg"))
+		self.actionSaveSliceTo.setStatusTip(u"Slice Video TO Images")
+		self.actionSaveSliceTo.triggered.connect(self.videoSliceToFolder)
 
 		self.actionSelectSource.setIcon(QIcon(icon_path + "/folder-open.svg"))
 		self.actionSelectSource.setStatusTip(u"Open Folder Contains Source Images")
@@ -249,8 +253,7 @@ backend image process: gCVmat using OpenCV
 		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
 
-		self.actionDataCleansing.triggered.connect(self.todoInfo)
-
+		self.actionCutImage.triggered.connect(self.todoInfo)
 
 
 		self.actionOnline_Help.triggered.connect(self.onlineHelp)
@@ -384,7 +387,7 @@ backend image process: gCVmat using OpenCV
 		if self.gImgList_exist:
 			self.showImgFromPath(self.gImgList.FirstImg())
 
-	def showNextImg(self):
+	def showNextImg(self):#
 		if Debug:
 			print("showNextImg")
 		if self.gImgList_exist:
@@ -522,6 +525,10 @@ backend image process: gCVmat using OpenCV
 			self.printToStatus("create VOC Folder in " + choosed_folder)
 
 	def todoInfo(self):
+		"""
+		Info that this function is not finished yet!
+		:return:
+		"""
 		if Debug:
 			print("todoInfo")
 		reply = QMessageBox.about(self.gMesssage, "Todo Info", "This function will be active in future version.")
@@ -545,6 +552,11 @@ backend image process: gCVmat using OpenCV
 		reply = self.gMesssage.aboutQt(self)
 
 	def closeEvent(self, event):
+		"""
+		Event: query when exit app
+		:param event:
+		:return:
+		"""
 		if Debug:
 			pass
 		else:

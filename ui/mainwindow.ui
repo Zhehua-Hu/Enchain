@@ -68,19 +68,12 @@
     </property>
     <addaction name="actionShow_guidance"/>
    </widget>
-   <widget class="QMenu" name="menuPipeline">
-    <property name="title">
-     <string>Project</string>
-    </property>
-    <addaction name="actionSetUserInfo"/>
-    <addaction name="actionCreateVOCFolder"/>
-   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionCreateVOCFolder"/>
     <addaction name="actionCutImage"/>
-    <addaction name="actionRename"/>
    </widget>
    <widget class="QMenu" name="menuManagement">
     <property name="title">
@@ -96,7 +89,7 @@
      <property name="title">
       <string>Images</string>
      </property>
-     <addaction name="actionOpenFolder"/>
+     <addaction name="actionOpenImageFolder"/>
      <addaction name="actionOpenImage"/>
      <addaction name="actionSaveImage"/>
     </widget>
@@ -105,28 +98,28 @@
       <string>Video</string>
      </property>
      <addaction name="actionOpenVideo"/>
-     <addaction name="actionVideoSlice"/>
+     <addaction name="actionOpenVideoFolder"/>
+     <addaction name="separator"/>
+     <addaction name="actionSaveSliceTo"/>
     </widget>
-    <widget class="QMenu" name="menuSelection">
+    <widget class="QMenu" name="menuDataCleansing">
      <property name="title">
-      <string>Selection</string>
+      <string>DataCleansing</string>
      </property>
      <addaction name="actionSelectSource"/>
      <addaction name="actionSelectDestination"/>
+     <addaction name="separator"/>
     </widget>
     <addaction name="menuVideo"/>
     <addaction name="menuImages"/>
     <addaction name="separator"/>
-    <addaction name="actionDataCleansing"/>
-    <addaction name="separator"/>
-    <addaction name="menuSelection"/>
+    <addaction name="menuDataCleansing"/>
     <addaction name="separator"/>
     <addaction name="actionAssignment"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
    </widget>
-   <addaction name="menuPipeline"/>
    <addaction name="menuPreprocess"/>
    <addaction name="menuTool"/>
    <addaction name="menuManagement"/>
@@ -185,14 +178,9 @@
     <string>Check Update</string>
    </property>
   </action>
-  <action name="actionRename">
+  <action name="actionOpenImageFolder">
    <property name="text">
-    <string>Rename</string>
-   </property>
-  </action>
-  <action name="actionOpenFolder">
-   <property name="text">
-    <string>OpenFolder</string>
+    <string>OpenImageFolder</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -230,24 +218,14 @@
     <string>Close</string>
    </property>
   </action>
-  <action name="actionSetUserInfo">
-   <property name="text">
-    <string>SetUserInfo</string>
-   </property>
-  </action>
   <action name="actionShow_guidance">
    <property name="text">
     <string>Guidance Wiki</string>
    </property>
   </action>
-  <action name="actionVideoSlice">
+  <action name="actionSaveSliceTo">
    <property name="text">
-    <string>VideoSlice</string>
-   </property>
-  </action>
-  <action name="actionDataCleansing">
-   <property name="text">
-    <string>DataCleansing</string>
+    <string>SaveSliceTo</string>
    </property>
   </action>
   <action name="actionSelectSource">
@@ -278,6 +256,11 @@
   <action name="actionCreateVOCFolder">
    <property name="text">
     <string>CreateVOCFolder</string>
+   </property>
+  </action>
+  <action name="actionOpenVideoFolder">
+   <property name="text">
+    <string>OpenVideoFolder</string>
    </property>
   </action>
  </widget>
