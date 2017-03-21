@@ -37,7 +37,8 @@ def videoSlice(video_path, save_path, progressbarsetter=None, save_type="png", i
 	:param video_path:
 	:param save_path:
 	:param save_type:
-	:param img_comp: 0:None Higher number increase compressive level
+	:param img_comp: default0:
+					None Higher number increase compressive level
 					png[0-9], jpg[0-100]
 	:return:
 	"""
@@ -77,6 +78,7 @@ def videoSlice(video_path, save_path, progressbarsetter=None, save_type="png", i
 		else:
 			break
 	print("Slicing Done!")
+	return count
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()

@@ -34,8 +34,8 @@ if USE_QRC:
 else:
 	icon_path = os.path.join(PRO_DIR, "icons")
 
-ProgressBarFull = 100
-ProgressBarEmpty = 0
+gProgressBarFull = 100
+gProgressBarEmpty = 0
 gSupported_img_suffix = ["BMP", "GIF", "JPG", "JPEG", "PNG", "TIFF", "PBM", "PGM", "PPM", "XBM", "XPM"]
 gSupported_video_suffix = ["AVI", "MP4"]
 __appname__ = "Enchain"
@@ -51,9 +51,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 import resources
-
-
 from ui.mainwindow import Ui_MainWindow
+from ui.AutoSelectSetting import Ui_AutoSelectSetting
+
 from libs.videoSlice import videoSlice, showVideoInfo
 from libs.create_VOC_dirs import create_VOC_dirs
 from libs.img_cvt_pyqt_cv import *
@@ -70,7 +70,7 @@ class FileList():
 		self.file_dirname = folder
 		self.file_suffix = supported_file_suffix
 		self.files_path, self.file_cnt = self.getContainedfiles(folder, type=search_type)
-		print(self.files_path)
+
 
 	def isEmpty(self):
 		if self.file_cnt > 0:
@@ -108,6 +108,8 @@ class FileList():
 			files_path.append(os.path.join(self.file_dirname, item))
 		return files_path, ret_cnt
 
+	def getFilesPathList(self):
+		return self.files_path
 
 	def firstFile(self):
 		return self.files_path[0]
@@ -122,7 +124,7 @@ class FileList():
 		self.cur_idx = self.safeLimit(self.cur_idx)
 		return self.files_path[self.cur_idx]
 	
-	def getFilePath(self):
+	def getCurFilePath(self):
 		return self.files_path[self.cur_idx]
 
 	def safeLimit(self, idx):
@@ -137,6 +139,12 @@ class FileList():
 		for item in self.__dict__.items():
 			print("%s : %s" % item)
 
+class AutoSelectSettingClass(QDialog, Ui_AutoSelectSetting):
+	def __init__(self, parent=None):
+		super(QDialog, self).__init__()
+		QMainWindow.__init__(self, parent)
+		self.setupUi(self)
+		self.dialog = QInputDialog()
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
@@ -151,21 +159,22 @@ backend image process: gCVmat using OpenCV
 		self._gFileDialog = QFileDialog()
 		self._gMesssage = QMessageBox()
 		self._graphicsscene = QGraphicsScene()
-		self._graphicsView.setScene(self._graphicsscene)
+		# DO NOT RENAME "graphicsView"
+		self.graphicsView.setScene(self._graphicsscene)
 
 		# global variables
 		self._gCVmat = None
-		self.gQpixmap = None
-		self.gQimg = None
-		self.gVideo = None
-		self.gVidDesFolder = None
-		self.gVidoesFolder = None
-		self.gVidoesList = None
+		self._gQpixmap = None
+		self._gQimg = None
+		self._gVideo = None
+		self._gVidDesFolder = None
+		self._gVidoesFolder = None
+		self._gVidoesList = None
 
-		self.gSelectSourceFolder = None
-		self.gSelectSource_exist = False
-		self.gImgList = None
-		self.gImgList_exist = False
+		self._gSelectSourceFolder = None
+		self._gSelectSource_exist = False
+		self._gImgList = None
+		self._gImgList_exist = False
 
 
 		self.gSelectDestinationFolder = None
@@ -173,7 +182,7 @@ backend image process: gCVmat using OpenCV
 
 
 
-		self.progressBar.step =100
+		self.progressBar.step = gProgressBarEmpty
 		self.progressBar.setValue(self.progressBar.step)
 
 		self.dockWidgetRight.setObjectName("listView")
@@ -184,58 +193,58 @@ backend image process: gCVmat using OpenCV
 		self.setupStatusbar()
 
 # Event Testing
-	def wheelEvent(self, ev):
-		# print(ev.phase())
-		# print(ev.x())
-		# print(ev.y())
-		# print(ev.pos())
-		# print(ev.posF())
-		# print(ev.globalX())
-		# print(ev.globalY())
-		# print(ev.angleDelta())
-		# print(ev.pixelDelta())
-		# print(ev.buttons())
-
-		# for item in type(ev).__dict__:
-		# 	print(item)
-			# print(getattr(ev,item))
-
-		def isWheelUp(ev):
-			if ev.angleDelta().y() >=0:
-				return True
-			else:
-				return False
-		print(isWheelUp(ev))
-		# print(ev.angleDelta().y())
-
-
-		ev.accept()
-
-	def keyPressEvent(self, ev):
-		# print(ev)
-		key = ev.key()
-		print(key)
-
-	def enterEvent(self, ev):
-		print("enterEvent")
-
-	def leaveEvent(self, ev):
-		print("leaveEvent")
-
-	def focusOutEvent(self, ev):
-		print("focusOutEvent")
-
-	def mouseMoveEvent(self, ev):
-		print("mouseMoveEvent")
-		print(ev.pos())
-
-	def mousePressEvent(self, ev):
-		print("mousePressEvent")
-		print(ev.pos())
-
-	def mouseReleaseEvent(self, ev):
-		print("mouseReleaseEvent")
-		print(ev.pos())
+# 	def wheelEvent(self, ev):
+# 		# print(ev.phase())
+# 		# print(ev.x())
+# 		# print(ev.y())
+# 		# print(ev.pos())
+# 		# print(ev.posF())
+# 		# print(ev.globalX())
+# 		# print(ev.globalY())
+# 		# print(ev.angleDelta())
+# 		# print(ev.pixelDelta())
+# 		# print(ev.buttons())
+#
+# 		# for item in type(ev).__dict__:
+# 		# 	print(item)
+# 			# print(getattr(ev,item))
+#
+# 		def isWheelUp(ev):
+# 			if ev.angleDelta().y() >=0:
+# 				return True
+# 			else:
+# 				return False
+# 		print(isWheelUp(ev))
+# 		# print(ev.angleDelta().y())
+#
+#
+# 		ev.accept()
+#
+# 	def keyPressEvent(self, ev):
+# 		# print(ev)
+# 		key = ev.key()
+# 		print(key)
+#
+# 	def enterEvent(self, ev):
+# 		print("enterEvent")
+#
+# 	def leaveEvent(self, ev):
+# 		print("leaveEvent")
+#
+# 	def focusOutEvent(self, ev):
+# 		print("focusOutEvent")
+#
+# 	def mouseMoveEvent(self, ev):
+# 		print("mouseMoveEvent")
+# 		print(ev.pos())
+#
+# 	def mousePressEvent(self, ev):
+# 		print("mousePressEvent")
+# 		print(ev.pos())
+#
+# 	def mouseReleaseEvent(self, ev):
+# 		print("mouseReleaseEvent")
+# 		print(ev.pos())
 
 
 
@@ -292,11 +301,28 @@ backend image process: gCVmat using OpenCV
 		self.actionSelectDestination.setStatusTip(u"Open Folder To Save Selected Images")
 		self.actionSelectDestination.triggered.connect(self.setSelectDestinationFolder)
 
+		self.actionAutoSelect.setIcon(QIcon(icon_path + "/pokeball.svg"))
+		self.actionAutoSelect.setStatusTip(u"Auto Select From Images")
+		self.actionAutoSelect.triggered.connect(self.autoSelect)
+
+		self.actionOnline_Help.setIcon(QIcon(icon_path + "/search-web.svg"))
 		self.actionOnline_Help.triggered.connect(self.onlineHelp)
+
+		self.actionAbout_Enchain.setIcon(QIcon(icon_path + "/EnchainLogoLittle.ico"))
 		self.actionAbout_Enchain.triggered.connect(self.about_Enchain)
+
+		self.actionAbout_Qt.setIcon(QIcon(icon_path + "/qt.png"))
 		self.actionAbout_Qt.triggered.connect(self.aboutQt)
 
 		# TODO
+		self.actionConnect_Author.setIcon(QIcon(icon_path + "/account-circle.svg"))
+		self.actionConnect_Author.triggered.connect(self.todoInfo)
+
+		self.actionCheck_Update.setIcon(QIcon(icon_path + "/autorenew.svg"))
+		self.actionCheck_Update.triggered.connect(self.todoInfo)
+
+		self.actionAssignment.setIcon(QIcon(icon_path + "/account-multiple.svg"))
+
 		self.actionCutImage.triggered.connect(self.todoInfo)
 		self.actionShow_guidance.triggered.connect(self.todoInfo)
 		self.actionDatasetInput.triggered.connect(self.todoInfo)
@@ -337,7 +363,7 @@ backend image process: gCVmat using OpenCV
 
 	def openImage(self):
 		"""
-		Open and Show single image
+		Open and Show single imagesaveSliceSetToFolder
 		:return:
 		"""
 		if Debug:
@@ -370,8 +396,8 @@ backend image process: gCVmat using OpenCV
 
 	def updateView(self, qpixmap):
 		self.clearView()
-		viewWidth = self._graphicsView.frameGeometry().width()
-		viewHeight = self._graphicsView.frameGeometry().height()
+		viewWidth = self.graphicsView.frameGeometry().width()
+		viewHeight = self.graphicsView.frameGeometry().height()
 
 		# fix window
 		pixRatioMap = qpixmap.scaled(viewWidth, viewHeight, Qt.KeepAspectRatio)
@@ -384,44 +410,19 @@ backend image process: gCVmat using OpenCV
 		for item in items:
 			self._graphicsscene.removeItem(item)
 
-	def setSelectSourceFolder(self):
-		if Debug:
-			print("setSelectSourceFolder")
-			tmp_path = os.path.join(PRO_DIR, "test/")
-		else:
-			tmp_path = os.path.expanduser("~")
-
-		if self.gSelectSource_exist:
-			print("Select Source Has Set!")
-
-		choosed_folder = self._gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
-		if choosed_folder == u'' or choosed_folder == '':
-			return # avoid bug: open filedialog but not choose anything
-		if choosed_folder is not None:
-			self.gSelectSourceFolder = choosed_folder
-
-		self.gImgList = FileList(self.gSelectSourceFolder, gSupported_img_suffix)
-		if self.gImgList.isEmpty():
-			print("List is EMPTY")
-			self.printToStatus("Contained nothing under condition")
-		else:
-			self.gSelectSource_exist = True
-			self.gImgList_exist = True
-		if self.gImgList_exist:
-			self.showImgFromPath(self.gImgList.firstFile())
-
 	def showNextImg(self):
 		if Debug:
 			print("showNextImg")
-		if self.gImgList_exist:
-			self.showImgFromPath(self.gImgList.nextFile())
+		if self._gImgList_exist:
+			self.showImgFromPath(self._gImgList.nextFile())
 
 	def showPreviousImg(self):
 		if Debug:
 			print("showPreviousImg")
-		if self.gImgList_exist:
-			self.showImgFromPath(self.gImgList.previousFile())
+		if self._gImgList_exist:
+			self.showImgFromPath(self._gImgList.previousFile())
 
+# Video
 	def setVideo(self):
 		"""
 		Set single video to slice
@@ -438,14 +439,14 @@ backend image process: gCVmat using OpenCV
 		if choosed_path[0] == u'' or choosed_path[0] == '':
 			return # avoid bug: open filedialog but not choose anything
 		if choosed_path[0] is not None:
-			self.gVideo = choosed_path[0]
-			print("path->: ", self.gVideo)
-			print(type(self.gVideo))
+			self._gVideo = choosed_path[0]
+			print("path->: ", self._gVideo)
+			print(type(self._gVideo))
 			vhandle, fps, size, firstframe = showVideoInfo(choosed_path[0])
 			self.showImgFromCVmat(firstframe)
 
 		self.printToStatus("Please Choose Folder To Save Video Slice")
-		self.setProgressBar(ProgressBarEmpty)
+		self.setProgressBar(gProgressBarEmpty)
 
 	def saveSliceToFolder(self):
 		"""
@@ -462,10 +463,10 @@ backend image process: gCVmat using OpenCV
 		if choosed_folder == u'' or choosed_folder == '':
 			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder is not None:
-			self.gVidDesFolder = choosed_folder
+			self._gVidDesFolder = choosed_folder
 
-		videoSlice(self.gVideo, self.gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
-		self.setProgressBar(ProgressBarFull)
+		videoSlice(self._gVideo, self._gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
+		self.setProgressBar(gProgressBarFull)
 
 	def setVideosFolder(self):
 		if Debug:
@@ -480,14 +481,14 @@ backend image process: gCVmat using OpenCV
 		if choosed_folder == u'' or choosed_folder == '':
 			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder is not None:
-			self.gVidoesFolder = choosed_folder
+			self._gVidoesFolder = choosed_folder
 
-		self.gVidoesList = FileList(self.gVidoesFolder, gSupported_video_suffix)
-		if self.gVidoesList.isEmpty():
+		self._gVidoesList = FileList(self._gVidoesFolder, gSupported_video_suffix)
+		if self._gVidoesList.isEmpty():
 			print("List is EMPTY")
 			self.printToStatus("Contained nothing under condition")
 		else:
-			self.printToStatus(self.gVidoesList.firstFile())
+			self.printToStatus(self._gVidoesList.firstFile())
 
 	def saveSliceSetToFolder(self):
 		"""
@@ -504,10 +505,43 @@ backend image process: gCVmat using OpenCV
 		if choosed_folder == u'' or choosed_folder == '':
 			return # avoid bug: open filedialog but not choose anything
 		if choosed_folder is not None:
-			self.gVidDesFolder = choosed_folder
+			self._gVidDesFolder = choosed_folder
 
-		videoSlice(self.gVideo, self.gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
-		self.setProgressBar(ProgressBarFull)
+		idx = 1
+		for video in self._gVidoesList.getFilesPathList():
+			self.setProgressBar(gProgressBarEmpty)
+			self.printToStatus("Process \"%s\", Please Wait." % video)
+			processed_cnt = videoSlice(video, self._gVidDesFolder, \
+			                           progressbarsetter=self.setProgressBar, \
+			                           save_type="png", img_comp=9, start_idx=idx)
+			idx += processed_cnt
+
+# Image
+	def setSelectSourceFolder(self):
+		if Debug:
+			print("setSelectSourceFolder")
+			tmp_path = os.path.join(PRO_DIR, "test/")
+		else:
+			tmp_path = os.path.expanduser("~")
+
+		if self._gSelectSource_exist:
+			print("Select Source Has Set!")
+
+		choosed_folder = self._gFileDialog.getExistingDirectory(self, u"Open Folder", tmp_path)
+		if choosed_folder == u'' or choosed_folder == '':
+			return # avoid bug: open filedialog but not choose anything
+		if choosed_folder is not None:
+			self._gSelectSourceFolder = choosed_folder
+
+		self._gImgList = FileList(self._gSelectSourceFolder, gSupported_img_suffix)
+		if self._gImgList.isEmpty():
+			print("List is EMPTY")
+			self.printToStatus("Contained nothing under condition")
+		else:
+			self._gSelectSource_exist = True
+			self._gImgList_exist = True
+		if self._gImgList_exist:
+			self.showImgFromPath(self._gImgList.firstFile())
 
 	def setSelectDestinationFolder(self):
 		if Debug:
@@ -532,10 +566,11 @@ backend image process: gCVmat using OpenCV
 		if Debug:
 			print("selectImg")
 		if self.gSelectDestination_exist:
-			img_src = self.gImgList.getImgPath()
-			img_des = self.gSelectDestinationFolder
+			img_src = self._gImgList.getCurFilePath()
+			# img_des = self.gSelectDestinationFolder
 			# print img_src, img_des
 			shutil.copy(img_src, self.gSelectDestinationFolder)
+			self.printToStatus("Select \"%s\"" % img_src)
 		else:
 			print("Did not set Select Destination!")
 
@@ -547,10 +582,30 @@ backend image process: gCVmat using OpenCV
 		if Debug:
 			print("deleteImg")
 		if self.gSelectDestination_exist:
-			print(self.gImgList.cur_idx)
+			print(self._gImgList.cur_idx)
 		else:
 			print("Did not set Select Destination!")
 
+	def autoSelect(self):
+		if Debug:
+			print("autoSelect")
+			tmp_path = os.path.join(PRO_DIR, u"test/")
+		else:
+			tmp_path = os.path.expanduser(u"~")
+
+		tmp_idx = 1
+		if self._gImgList_exist and self.gSelectDestination_exist:
+			for img_src in self._gImgList.getFilesPathList():
+				if tmp_idx % 50 == 0:
+					shutil.copy(img_src, self.gSelectDestinationFolder)
+					self.printToStatus("Select \"%s\"" % img_src)
+				tmp_idx += 1
+		else:
+			print("ImgList or SelectDestination Not Exist!")
+		self.printToStatus("AutoSelect Finish")
+        # intNum, is_ok = QInputDialog.getInt(self, "QInputDialog.getInteger()","Percentage:", 25, 0, 100, 1)
+        # if is_ok:
+        #     self.label_integer.setText(str(intNum))
 
 	def saveImageFromBackendCVmat(self):
 		default_name = "test.jpg"

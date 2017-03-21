@@ -14,6 +14,12 @@
 <file alias="close-circle.svg">icons/close-circle.svg</file>
 <file alias="exit-to-app.svg">icons/exit-to-app.svg</file>
 <file alias="image-area.svg">icons/image-area.svg</file>
+<file alias="pokeball.svg">icons/pokeball.svg</file>
+<file alias="account-multiple.svg">icons/account-multiple.svg</file>
+<file alias="help-circle.svg">icons/help-circle.svg</file>
+<file alias="search-web.svg">icons/search-web.svg</file>
+<file alias="qt.png">icons/qt.png</file>
+<file alias="autorenew.svg">icons/autorenew.svg</file>
 
 <file alias="EnchainLogoLittle.png">icons/EnchainLogoLittle.png</file>
 <file alias="EnchainLogoLittle.ico">icons/EnchainLogoLittle.ico</file>

@@ -57,7 +57,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionOnline_Help"/>
-    <addaction name="actionAuthor_Info"/>
+    <addaction name="actionConnect_Author"/>
     <addaction name="actionCheck_Update"/>
     <addaction name="actionAbout_Enchain"/>
     <addaction name="actionAbout_Qt"/>
@@ -119,6 +119,8 @@
      <addaction name="actionSelectSource"/>
      <addaction name="actionSelectDestination"/>
      <addaction name="separator"/>
+     <addaction name="actionAutoSelect"/>
+     <addaction name="separator"/>
     </widget>
     <addaction name="menuVideo"/>
     <addaction name="menuImages"/>
@@ -173,7 +175,7 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionAuthor_Info">
+  <action name="actionConnect_Author">
    <property name="text">
     <string>Connect Author</string>
    </property>
@@ -286,6 +288,11 @@
   <action name="actionFolderContained">
    <property name="text">
     <string>FolderContained</string>
+   </property>
+  </action>
+  <action name="actionAutoSelect">
+   <property name="text">
+    <string>AutoSelect</string>
    </property>
   </action>
  </widget>

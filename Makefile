@@ -13,6 +13,7 @@ qt4py3:
 
 qt5:
 	pyrcc5 -o resources.py resources.qrc
+	pyuic5 ui/AutoSelectSetting.ui -o ui/AutoSelectSetting.py
 	pyuic5 ui/mainwindow.ui -o ui/mainwindow.py
 
 #_________________________________________
