@@ -41,6 +41,9 @@ It is also a guidance/pipeline to prepare your own dataset.
 * Can not open video with Chinese path in windows  
 solvered in ubuntu, see "videoSlice.py": `vhandle = cv2.VideoCapture(video_path.encode('utf-8'))`
 
+* left & right widgets name can not be set in Qt designer
+
+* AutoSelectSetting was shown at another thread
 
 ## Acknowladgement
 

@@ -52,105 +52,21 @@ from PyQt5.QtWidgets import *
 
 import resources
 from ui.mainwindow import Ui_MainWindow
-from ui.AutoSelectSetting import Ui_AutoSelectSetting
+from ui.AutoSelectSettingDialog import AutoSelectSettingDialog
 
 from libs.videoSlice import videoSlice, showVideoInfo
 from libs.create_VOC_dirs import create_VOC_dirs
 from libs.img_cvt_pyqt_cv import *
+from libs.FileList import FileList
 
-class FileList():
-	"""
-	class: provide file(eg.images,videos) list management
-	"""
-
-	cur_idx = 0
-	file_cnt = 0
-
-	def __init__(self, folder, supported_file_suffix, search_type="NotRecursive"):
-		self.file_dirname = folder
-		self.file_suffix = supported_file_suffix
-		self.files_path, self.file_cnt = self.getContainedfiles(folder, type=search_type)
-
-
-	def isEmpty(self):
-		if self.file_cnt > 0:
-			return False
-		else:
-			return True
-
-	def getContainedfiles(self, folder, type="NotRecursive"):
-		"""
-		get Contained files
-		:param folder: searched folder
-		:param type: determine if search sub-folder
-		:return: full path list, list length
-		"""
-		files_name = []
-		files_path = []
-		ret_cnt = 0
-		for root, dirs, filenames in os.walk(folder):
-			if type == "Recursive":
-				for filename in filenames:
-					if not filename.startswith('.'): # not hiden file
-						if filename.split(".")[-1].upper() in self.file_suffix:
-							files_name.append(filename)
-							ret_cnt += 1
-			else:
-				for filename in filenames:
-					if not filename.startswith('.'): # not hiden file
-						if filename.split(".")[-1].upper() in self.file_suffix:
-							files_name.append(filename)
-				ret_cnt = len(files_name)
-				break
-
-		files_name.sort()  # from 000001 to increase
-		for item in files_name:
-			files_path.append(os.path.join(self.file_dirname, item))
-		return files_path, ret_cnt
-
-	def getFilesPathList(self):
-		return self.files_path
-
-	def firstFile(self):
-		return self.files_path[0]
-
-	def nextFile(self):
-		self.cur_idx += 1
-		self.cur_idx = self.safeLimit(self.cur_idx)
-		return self.files_path[self.cur_idx]
-
-	def previousFile(self):
-		self.cur_idx -= 1
-		self.cur_idx = self.safeLimit(self.cur_idx)
-		return self.files_path[self.cur_idx]
-	
-	def getCurFilePath(self):
-		return self.files_path[self.cur_idx]
-
-	def safeLimit(self, idx):
-		if idx > self.file_cnt-1:
-			return self.file_cnt-1
-		elif idx < 0:
-			return 0
-		else:
-			return idx
-
-	def __repr__(self):
-		for item in self.__dict__.items():
-			print("%s : %s" % item)
-
-class AutoSelectSettingClass(QDialog, Ui_AutoSelectSetting):
-	def __init__(self, parent=None):
-		super(QDialog, self).__init__()
-		QMainWindow.__init__(self, parent)
-		self.setupUi(self)
-		self.dialog = QInputDialog()
+global gContinue
+gContinue = False
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 	"""
-Main Window in Enchain.
-backend image process: gCVmat using OpenCV
-"""
+	Main Window in Enchain.
+	backend image process: gCVmat using OpenCV
+	"""
 	def __init__(self, parent=None):
 		super(QMainWindow, self).__init__()
 		QMainWindow.__init__(self, parent)
@@ -161,6 +77,10 @@ backend image process: gCVmat using OpenCV
 		self._graphicsscene = QGraphicsScene()
 		# DO NOT RENAME "graphicsView"
 		self.graphicsView.setScene(self._graphicsscene)
+
+		self._gAutoSelectSettingDialog = AutoSelectSettingDialog()
+
+
 
 		# global variables
 		self._gCVmat = None
@@ -399,7 +319,7 @@ backend image process: gCVmat using OpenCV
 		viewWidth = self.graphicsView.frameGeometry().width()
 		viewHeight = self.graphicsView.frameGeometry().height()
 
-		# fix window
+		# fix-ratio image
 		pixRatioMap = qpixmap.scaled(viewWidth, viewHeight, Qt.KeepAspectRatio)
 		pixItem = QGraphicsPixmapItem(pixRatioMap)
 		self._graphicsscene.addItem(pixItem)
@@ -593,19 +513,29 @@ backend image process: gCVmat using OpenCV
 		else:
 			tmp_path = os.path.expanduser(u"~")
 
-		tmp_idx = 1
-		if self._gImgList_exist and self.gSelectDestination_exist:
-			for img_src in self._gImgList.getFilesPathList():
-				if tmp_idx % 50 == 0:
-					shutil.copy(img_src, self.gSelectDestinationFolder)
-					self.printToStatus("Select \"%s\"" % img_src)
-				tmp_idx += 1
-		else:
-			print("ImgList or SelectDestination Not Exist!")
-		self.printToStatus("AutoSelect Finish")
-        # intNum, is_ok = QInputDialog.getInt(self, "QInputDialog.getInteger()","Percentage:", 25, 0, 100, 1)
-        # if is_ok:
-        #     self.label_integer.setText(str(intNum))
+		# TODO not enter event-loop
+		print(self._gAutoSelectSettingDialog.show())
+
+
+		# value_has_set, value = self._gAutoSelectSettingDialog.getValue()
+		# if value_has_set:
+		# 	self.printToStatus("Using Stride [%d] to AutoSelect" % value)
+		# else:
+		# 	self.printToStatus("Using Stride [1] to AutoSelect")
+		# stride = value
+		# print(stride)
+		print("Show End")
+		# tmp_idx = 1
+		# if self._gImgList_exist and self.gSelectDestination_exist:
+		# 	for img_src in self._gImgList.getFilesPathList():
+		# 		if tmp_idx % stride == 0:
+		# 			shutil.copy(img_src, self.gSelectDestinationFolder)
+		# 			self.printToStatus("Select \"%s\"" % img_src)
+		# 		tmp_idx += 1
+		# else:
+		# 	print("ImgList or SelectDestination Not Exist!")
+		# self.printToStatus("AutoSelect Finish")
+
 
 	def saveImageFromBackendCVmat(self):
 		default_name = "test.jpg"
