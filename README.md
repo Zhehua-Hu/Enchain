@@ -15,10 +15,23 @@ It is also a guidance/pipeline to prepare your own dataset.
 
 * Binary Execuable File
     - [Windows]() (Tested on win7)
-    - [Linux]() (Tested on Ubuntu16.04)
+    - [Linux]() (Not Support Yet)
 * Compile From Source Code
     ```
-    blabla...
+    # Download
+    git clone --recursive https://github.com/Zhehua-Hu/Enchain
+    
+    # Install Dependency
+    ## pyqt5 for python2.x
+    sudo apt-get install python-pyqt5
+    ## needed tools
+    sudo apt-get install pyqt5-dev-tools
+    ## UI software
+    sudo apt-get install qt4-designer
+    
+    # Run
+    cd Enchain
+    python Enchain.py
     ```
 
 
