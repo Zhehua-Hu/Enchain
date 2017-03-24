@@ -20,6 +20,8 @@
 <file alias="search-web.svg">icons/search-web.svg</file>
 <file alias="qt.png">icons/qt.png</file>
 <file alias="autorenew.svg">icons/autorenew.svg</file>
+<file alias="run.svg">icons/run.svg</file>
+<file alias="content-save.svg">icons/content-save.svg</file>
 
 <file alias="EnchainLogoLittle.png">icons/EnchainLogoLittle.png</file>
 <file alias="EnchainLogoLittle.ico">icons/EnchainLogoLittle.ico</file>

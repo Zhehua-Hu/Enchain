@@ -119,7 +119,8 @@
      <addaction name="actionSelectSource"/>
      <addaction name="actionSelectDestination"/>
      <addaction name="separator"/>
-     <addaction name="actionAutoSelect"/>
+     <addaction name="actionAutoSelectSetting"/>
+     <addaction name="actionAutoSelectStart"/>
      <addaction name="separator"/>
     </widget>
     <addaction name="menuVideo"/>
@@ -290,9 +291,14 @@
     <string>FolderContained</string>
    </property>
   </action>
-  <action name="actionAutoSelect">
+  <action name="actionAutoSelectSetting">
    <property name="text">
-    <string>AutoSelect</string>
+    <string>AutoSelectSetting</string>
+   </property>
+  </action>
+  <action name="actionAutoSelectStart">
+   <property name="text">
+    <string>AutoSelectStart</string>
    </property>
   </action>
  </widget>

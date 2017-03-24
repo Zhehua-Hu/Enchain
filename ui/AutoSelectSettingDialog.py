@@ -9,21 +9,22 @@ from PyQt5.QtWidgets import QDialog, QSpinBox
 
 from AutoSelectSetting import Ui_AutoSelectSetting
 
+
 class AutoSelectSettingDialog(QDialog, Ui_AutoSelectSetting):
 
-	def __init__(self, parent=None):
-		QDialog.__init__(self)
-		self.setupUi(self)
+    def __init__(self, parent=None):
+        QDialog.__init__(self)
+        self.setupUi(self)
 
-		self.buttonBoxQuery.accepted.connect(self.setValue)
-		self.buttonBoxQuery.rejected.connect(self.close)
+        self.buttonBoxQuery.accepted.connect(self.set_value)
+        self.buttonBoxQuery.rejected.connect(self.close)
 
-		self.value = 1
-		self.value_has_set = False
+        self.value = 1
+        self.value_has_set = False
 
-	def setValue(self):
-		self.value_has_set = True
+    def set_value(self):
+        self.value_has_set = True
+        self.value = self.spinBox.value()
 
-
-	def getValue(self):
-		return self.value_has_set, self.spinBox.value()
+    def get_value(self):
+        return self.value
