@@ -29,8 +29,12 @@ It is also a guidance/pipeline to prepare your own dataset.
     ## UI software
     sudo apt-get install qt4-designer
     
-    # Run
+
     cd Enchain
+    # Build Resources
+    make all
+
+    # Run
     python Enchain.py
     ```
 
