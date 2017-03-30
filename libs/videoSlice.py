@@ -13,7 +13,8 @@ import cv2
 
 def showVideoInfo(video_path):
     try:
-        vhandle = cv2.VideoCapture(video_path.encode('utf-8'))  # For read Chinease-name video
+        vhandle = cv2.VideoCapture(video_path)  # For read Chinease-name video
+        # vhandle = cv2.VideoCapture(video_path.encode('utf-8'))  # For read Chinease-name video
         fps = vhandle.get(cv2.CAP_PROP_FPS)
         count = vhandle.get(cv2.CAP_PROP_FRAME_COUNT)
         size = (int(vhandle.get(cv2.CAP_PROP_FRAME_WIDTH)),
@@ -43,7 +44,8 @@ def videoSlice(video_path, save_path, progressbarsetter=None, save_type="png", i
     """
 
     # For read Chinease-name video
-    vid_handle = cv2.VideoCapture(video_path.encode('utf-8'))
+    vid_handle = cv2.VideoCapture(video_path)
+    # vid_handle = cv2.VideoCapture(video_path.encode('utf-8'))
     fps = vid_handle.get(cv2.CAP_PROP_FPS)
     count = vid_handle.get(cv2.CAP_PROP_FRAME_COUNT)
     size = (int(vid_handle.get(cv2.CAP_PROP_FRAME_WIDTH)),
