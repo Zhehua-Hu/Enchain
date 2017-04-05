@@ -23,6 +23,7 @@ It is also a guidance/pipeline to prepare your own dataset.
     
     # Install Dependency
     ## pyqt5 for python2.x
+    ## work in ubuntu16.04
     sudo apt-get install python-pyqt5
     ## needed tools
     sudo apt-get install pyqt5-dev-tools

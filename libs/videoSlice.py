@@ -14,7 +14,6 @@ import cv2
 def showVideoInfo(video_path):
     try:
         vhandle = cv2.VideoCapture(video_path)  # For read Chinease-name video
-        # vhandle = cv2.VideoCapture(video_path.encode('utf-8'))  # For read Chinease-name video
         fps = vhandle.get(cv2.CAP_PROP_FPS)
         count = vhandle.get(cv2.CAP_PROP_FRAME_COUNT)
         size = (int(vhandle.get(cv2.CAP_PROP_FRAME_WIDTH)),
