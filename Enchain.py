@@ -388,7 +388,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if choosed_folder is not None:
             self._gVidDesFolder = choosed_folder
 
-        videoSlice(self._gVideo, self._gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
+        # videoSlice(self._gVideo, self._gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="png")
+        videoSlice(self._gVideo, self._gVidDesFolder, progressbarsetter=self.setProgressBar, save_type="jpg")
         self.setProgressBar(gProgressBarFull)
 
     def setVideosFolder(self):
